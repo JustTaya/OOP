@@ -1,0 +1,6 @@
+
+*.lck
+
+*.vpp-journal
+
+*.bak_000f
