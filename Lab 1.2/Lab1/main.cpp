@@ -42,6 +42,12 @@ TEST_CASE("Test IPv4", "[IPv4]") {
 
 TEST_CASE("Test IP", "[IP]") {
 
+    unsigned ip4[4];
+    ip4[0] = 209;
+    ip4[1] = 1;
+    ip4[2] = 53;
+    ip4[3] = 165;
+
     std::string *ip6 = new std::string[8];
     ip6[0] = "0";
     ip6[1] = "0";
@@ -51,40 +57,63 @@ TEST_CASE("Test IP", "[IP]") {
     ip6[5] = "ffff";
     ip6[6] = "d101";
     ip6[7] = "35a9";
-    SECTION("IPv4") {
+
+    SECTION("test1") {
         unsigned ip4_1[4];
         ip4_1[0] = 209;
         ip4_1[1] = 1;
         ip4_1[2] = 53;
         ip4_1[3] = 165;
-        SECTION("test1") {
-            unsigned ip4_2[4];
-            ip4_2[0] = 209;
-            ip4_2[1] = 1;
-            ip4_2[2] = 53;
-            ip4_2[3] = 165;
 
-            IP *ipv4 = new IP(ip4_1),
-                    *ipv6 = new IP(ip4_2);
-            REQUIRE(!ipv4->compare(ipv6));
-            REQUIRE(!ipv6->compare(ipv4));
-        }
-        SECTION("test2") {
-            unsigned ip4_2[4];
-            ip4_2[0] = 210;
-            ip4_2[1] = 1;
-            ip4_2[2] = 53;
-            ip4_2[3] = 168;
-
-            IP *ipv4 = new IP(ip4_1),
-                    *ipv6 = new IP(ip4_2);
-            REQUIRE(ipv4->compare(ipv6));
-           // REQUIRE(!ipv6->compare(ipv4));
-        }
+        IP *ipv4 = new IP(ip4),
+                *ipv6 = new IP(ip4_1);
+        REQUIRE(!ipv4->compare(ipv6));
+        REQUIRE(!ipv6->compare(ipv4));
     }
-    SECTION("IPv6") {
-        //  IP ipv6 = IP(ip6),
-        //        ipv4 = IP(ip4);
+    SECTION("test2") {
+        std::string *ip6 = new std::string[8];
+        ip6[0] = "0";
+        ip6[1] = "0";
+        ip6[2] = "0";
+        ip6[3] = "0";
+        ip6[4] = "0";
+        ip6[5] = "ffff";
+        ip6[6] = "d101";
+        ip6[7] = "35a9";
+
+        IP *ipv4_1 = new IP(ip4),
+                *ipv6 = new IP(ip6);
+        REQUIRE(ipv4_1->compare(ipv6));
+        REQUIRE(!ipv6->compare(ipv4_1));
+    }
+    SECTION("test3") {
+        std::string *ip6_1 = new std::string[8];
+        ip6_1[0] = "0";
+        ip6_1[1] = "0";
+        ip6_1[2] = "0";
+        ip6_1[3] = "0";
+        ip6_1[4] = "0";
+        ip6_1[5] = "ffff";
+        ip6_1[6] = "d110";
+        ip6_1[7] = "35a9";
+        IP *ipv6 = new IP(ip6),
+                *ipv6_1 = new IP(ip6_1);
+        REQUIRE(ipv6->compare(ipv6_1));
+        REQUIRE(!ipv6_1->compare(ipv6));
+    }
+}
+/* Subnet(IP *ip, unsigned mask) : ip(ip), mask(mask) {};
+
+    bool check(IP *checkIP);
+
+    bool compare(Subnet *right);    //compare the number of hosts*/
+TEST_CASE("Subnetwork test","[subnetwork]"){
+    //check
+    
+
+
+    //compare
+    SECTION("Compre method test"){
 
     }
 }
