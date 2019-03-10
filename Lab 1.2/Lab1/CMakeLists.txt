@@ -1,6 +1,19 @@
-cmake_minimum_required(VERSION 3.8)
-project(Lab1_1)
+cmake_minimum_required(VERSION 3.13)
+project(Lab1)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
-add_executable(Lab1_1 catch.hpp main.cpp Tree.h IPAddress.cpp IPAddress.h MultiTree.inc BinTree.inc BSTree.inc Convert.h Samples.h)
+include_directories(.)
+
+add_executable(Lab1
+        BinTree.inc
+        BSTree.inc
+        catch.hpp
+        CMakeLists.txt
+        Convert.h
+        IPAddress.cpp
+        IPAddress.h
+        main.cpp
+        MultiTree.inc
+        Samples.h
+        Tree.h)

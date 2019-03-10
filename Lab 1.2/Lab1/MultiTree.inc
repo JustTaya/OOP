@@ -1,3 +1,4 @@
+#include <algorithm>
 template<typename TKey, typename Cmp>
 MultiNode<TKey> *MultiTree<TKey, Cmp> ::insert(MultiNode<TKey> *node, TKey key) {
     if (node != nullptr) {
@@ -26,7 +27,7 @@ MultiNode<TKey> *MultiTree<TKey, Cmp>:: searchParent(TKey key) const {
                           });
 if(it!=tmp->nodes.end())
     return tmp;
-std ::for_each(tmp->nodes.begin(), tmp->nodes.end(), [&stack](MultiNode<TKey> *node) {
+std::for_each(tmp->nodes.begin(), tmp->nodes.end(), [&stack](MultiNode<TKey> *node) {
             stack.push(node);
         });
 }

@@ -40,6 +40,7 @@ IPv6 *IPv4::converttoIPv6() {
     buff.resize(8, '0');
     for (int i = 3; i >= 0; i--) {
         n = this->octet[i];
+        it=7-(3-i)*2;
         while (n != 0) {
             tmp = n % 16;
             n /= 16;
@@ -47,6 +48,7 @@ IPv6 *IPv4::converttoIPv6() {
             it--;
         }
     }
+    ip[5]="ffff";
     ip[6].append(buff.substr(0, 4));
     ip[7].append(buff.substr(4, 4));
     IPv6 *ip6 = new IPv6(ip);
@@ -174,15 +176,15 @@ bool IP::compare(IP *right) {
     } else {
         if (this->version == v4) {
             for (size_t i = 0; i < 4; i++)
-                if (this->address.ipv4->octet[i] < this->address.ipv4->octet[i])
+                if (this->address.ipv4->octet[i] < right->address.ipv4->octet[i])
                     return true;
-                else if (this->address.ipv4->octet[i] > this->address.ipv4->octet[i])
+                else if (this->address.ipv4->octet[i] > right->address.ipv4->octet[i])
                     return false;
         } else {
             for (size_t i = 0; i < 8; i++)
-                if (this->address.ipv6->octet[i] < this->address.ipv6->octet[i])
+                if (this->address.ipv6->octet[i] < right->address.ipv6->octet[i])
                     return true;
-                else if (this->address.ipv6->octet[i] > this->address.ipv6->octet[i])
+                else if (this->address.ipv6->octet[i] > right->address.ipv6->octet[i])
                     return false;
         }
     }
