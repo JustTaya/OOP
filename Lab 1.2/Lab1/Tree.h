@@ -85,7 +85,7 @@ class MultiTree : public Tree<TKey, Cmp> {
 public:
     MultiTree() : _root(nullptr) {};
 
-    explicit MultiTree(TKey key) : _root(MultiNode<TKey>(key)) {};
+    explicit MultiTree(TKey key) : _root(new MultiNode<TKey>(key)) {};
 
     virtual ~MultiTree();
 

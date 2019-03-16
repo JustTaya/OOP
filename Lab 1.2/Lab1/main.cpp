@@ -20,6 +20,7 @@ TEST_CASE("Test IPv6", "[IPv6]") {
     IPv6 ip(ip6);
     REQUIRE(ip.getBinary() == std::bitset<128>(
             "00100000000000010000110110111000000100011010001100001001110101110001111100110100100010100010111000000111101000000111011001011101"));
+    delete[] ip6;
 }
 
 TEST_CASE("Test IPv4", "[IPv4]") {
@@ -41,6 +42,7 @@ TEST_CASE("Test IPv4", "[IPv4]") {
     ip6[7] = "35a5";
     IPv6 tmp = IPv6(ip6);
     REQUIRE((*ip.converttoIPv6()).getBinary() == tmp.getBinary());
+    delete[] ip6;
 }
 
 TEST_CASE("Test IP", "[IP]") {
@@ -72,22 +74,14 @@ TEST_CASE("Test IP", "[IP]") {
                 *ipv6 = new IP(ip4_1);
         REQUIRE(!ipv4->compare(ipv6));
         REQUIRE(!ipv6->compare(ipv4));
+        delete ipv4, ipv6;
     }
     SECTION("test2") {
-        std::string *ip6 = new std::string[8];
-        ip6[0] = "0";
-        ip6[1] = "0";
-        ip6[2] = "0";
-        ip6[3] = "0";
-        ip6[4] = "0";
-        ip6[5] = "ffff";
-        ip6[6] = "d101";
-        ip6[7] = "35a9";
-
         IP *ipv4_1 = new IP(ip4),
                 *ipv6 = new IP(ip6);
         REQUIRE(ipv4_1->compare(ipv6));
         REQUIRE(!ipv6->compare(ipv4_1));
+        delete ipv4_1, ipv6;
     }
     SECTION("test3") {
         std::string *ip6_1 = new std::string[8];
@@ -103,7 +97,10 @@ TEST_CASE("Test IP", "[IP]") {
                 *ipv6_1 = new IP(ip6_1);
         REQUIRE(ipv6->compare(ipv6_1));
         REQUIRE(!ipv6_1->compare(ipv6));
+        delete[] ip6_1;
+        delete ipv6, ipv6_1;
     }
+    delete[] ip6;
 }
 
 TEST_CASE("Subnetwork test", "[subnetwork]") {
@@ -117,6 +114,7 @@ TEST_CASE("Subnetwork test", "[subnetwork]") {
         IP *ip = new IP(ip4);
         Subnet *netw = new Subnet(ip, 128);
         REQUIRE(netw->check(ip));
+        delete ip, netw;
     }
     //compare
     SECTION("Compare method test") {
@@ -126,11 +124,12 @@ TEST_CASE("Subnetwork test", "[subnetwork]") {
         ip4[2] = 53;
         ip4[3] = 165;
         IP *ip = new IP(ip4);
-        Subnet *netw1 = new Subnet(ip, 128);
-        Subnet *netw2 = new Subnet(ip, 120);
+        Subnet *netw1 = new Subnet(ip, 128),
+                *netw2 = new Subnet(ip, 120);
         REQUIRE(!netw1->compare(netw1));
         REQUIRE(netw2->compare(netw1));
         REQUIRE(!netw1->compare(netw2));
+        delete ip, netw1, netw2;
     }
 }
 
@@ -141,6 +140,7 @@ TEST_CASE("MultiNode class test", "[multinode]") {
     MultiNode<int> *node = new MultiNode<int>(tmp);
     REQUIRE(node->getKey() == tmp);
     REQUIRE(node->nodes.empty());
+    delete node;
 }
 
 TEST_CASE("BinNode class test", "[binnode]") {
@@ -148,10 +148,52 @@ TEST_CASE("BinNode class test", "[binnode]") {
     int tmp = rand() % 1000;
     BinNode<int> *node = new BinNode<int>(tmp);
     REQUIRE(node->getKey() == tmp);
-    REQUIRE(node->left==nullptr);
-    REQUIRE(node->right==nullptr);
+    REQUIRE(node->left == nullptr);
+    REQUIRE(node->right == nullptr);
+    delete node;
 }
 
+TEST_CASE("MultiTree class", "[multitree]") {
+    SECTION("Empty tree") {
+        MultiTree<int, std::less<int>> *tree = new MultiTree<int, std::less<int>>();
+        REQUIRE(tree->getRoot() == nullptr);
+        REQUIRE(tree->search(rand()) == nullptr);
+        REQUIRE(!tree->deleteNode(rand()));
+        SECTION("Add elements") {
+            int tmp = rand() % 500,
+                    tmp1 = rand() % 500 + 500,
+                    tmp2 = rand() % 500 + 500;
+            REQUIRE(tree->insertRoot(tmp));
+            REQUIRE(tree->search(tmp)->getKey() == tmp);
+            REQUIRE(tree->getRoot()->getKey() == tmp);
+            REQUIRE(tree->getRoot() == tree->search(tmp));
+            REQUIRE(!tree->insertRoot(tmp));
+
+            REQUIRE(tree->search(tmp1) == nullptr);
+            tree->insert(tree->search(tmp), tmp1);
+            tree->insert(tree->search(tmp), tmp2);
+            REQUIRE(tree->search(tmp1)->getKey() == tmp1);
+            REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+        }
+        delete tree;
+    }
+    SECTION("Tree with root") {
+        int tmp = rand() % 500,
+                tmp1 = rand() % 500 + 500,
+                tmp2 = rand() % 500 + 500;
+        MultiTree<int, std::less<int>> *tree = new MultiTree<int, std::less<int>>(tmp);
+        REQUIRE(tree->search(tmp)->getKey() == tmp);
+        REQUIRE(tree->getRoot()->getKey() == tmp);
+        REQUIRE(tree->getRoot() == tree->search(tmp));
+        REQUIRE(!tree->insertRoot(tmp));
+
+        REQUIRE(tree->search(tmp1) == nullptr);
+        tree->insert(tree->search(tmp), tmp1);
+        tree->insert(tree->search(tmp), tmp2);
+        REQUIRE(tree->search(tmp1)->getKey() == tmp1);
+        REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+    }
+}
 /*
 int main() {
     srand(time(NULL));
