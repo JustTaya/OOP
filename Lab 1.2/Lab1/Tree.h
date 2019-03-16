@@ -139,7 +139,7 @@ class BinTree : public Tree<TKey, Cmp> {
 public:
     BinTree() : _root(nullptr) {};
 
-    explicit BinTree(TKey key) : _root(BinNode<TKey>(key)) {};
+    explicit BinTree(TKey key) : _root(new BinNode<TKey>(key)) {};
 
     virtual ~BinTree();
 

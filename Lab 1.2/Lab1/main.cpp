@@ -163,37 +163,188 @@ TEST_CASE("MultiTree class", "[multitree]") {
             int tmp = rand() % 500,
                     tmp1 = rand() % 500 + 500,
                     tmp2 = rand() % 500 + 500;
-            REQUIRE(tree->insertRoot(tmp));
-            REQUIRE(tree->search(tmp)->getKey() == tmp);
-            REQUIRE(tree->getRoot()->getKey() == tmp);
-            REQUIRE(tree->getRoot() == tree->search(tmp));
-            REQUIRE(!tree->insertRoot(tmp));
 
-            REQUIRE(tree->search(tmp1) == nullptr);
-            tree->insert(tree->search(tmp), tmp1);
-            tree->insert(tree->search(tmp), tmp2);
-            REQUIRE(tree->search(tmp1)->getKey() == tmp1);
-            REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+            SECTION("root") {
+                REQUIRE(tree->insertRoot(tmp));
+                REQUIRE(tree->search(tmp)->getKey() == tmp);
+                REQUIRE(tree->getRoot()->getKey() == tmp);
+                REQUIRE(tree->getRoot() == tree->search(tmp));
+                REQUIRE(!tree->insertRoot(tmp));
+
+
+                SECTION("insert") {
+                    REQUIRE(tree->search(tmp1) == nullptr);
+                    tree->insert(tree->search(tmp), tmp1);
+                    tree->insert(tree->search(tmp), tmp2);
+                    REQUIRE(tree->search(tmp1)->getKey() == tmp1);
+                    REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+
+                    SECTION("delete") {
+                        tree->deleteNode(tmp1);
+                        REQUIRE(tree->search(tmp1) == nullptr);
+                    }
+                }
+            }
         }
-        delete tree;
     }
     SECTION("Tree with root") {
         int tmp = rand() % 500,
                 tmp1 = rand() % 500 + 500,
                 tmp2 = rand() % 500 + 500;
         MultiTree<int, std::less<int>> *tree = new MultiTree<int, std::less<int>>(tmp);
-        REQUIRE(tree->search(tmp)->getKey() == tmp);
-        REQUIRE(tree->getRoot()->getKey() == tmp);
-        REQUIRE(tree->getRoot() == tree->search(tmp));
-        REQUIRE(!tree->insertRoot(tmp));
 
-        REQUIRE(tree->search(tmp1) == nullptr);
-        tree->insert(tree->search(tmp), tmp1);
-        tree->insert(tree->search(tmp), tmp2);
-        REQUIRE(tree->search(tmp1)->getKey() == tmp1);
-        REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+        SECTION("root") {
+            REQUIRE(tree->search(tmp)->getKey() == tmp);
+            REQUIRE(tree->getRoot()->getKey() == tmp);
+            REQUIRE(tree->getRoot() == tree->search(tmp));
+            REQUIRE(!tree->insertRoot(tmp));
+        }
+
+        SECTION("insert") {
+            REQUIRE(tree->search(tmp1) == nullptr);
+            tree->insert(tree->search(tmp), tmp1);
+            tree->insert(tree->search(tmp), tmp2);
+            REQUIRE(tree->search(tmp1)->getKey() == tmp1);
+            REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+            SECTION("delete") {
+                tree->deleteNode(tmp1);
+                REQUIRE(tree->search(tmp1) == nullptr);
+            }
+        }
+        delete tree;
     }
 }
+
+
+TEST_CASE("BinTree class", "[bintree]") {
+    SECTION("Empty tree") {
+        BinTree<int, std::less<int>> *tree = new BinTree<int, std::less<int>>();
+        REQUIRE(tree->getRoot() == nullptr);
+        REQUIRE(tree->search(rand()) == nullptr);
+        REQUIRE(!tree->deleteNode(rand()));
+        SECTION("Add elements") {
+            int tmp = rand() % 500,
+                    tmp1 = rand() % 500 + 500,
+                    tmp2 = rand() % 500 + 500;
+
+            SECTION("root") {
+                REQUIRE(tree->insertRoot(tmp));
+                REQUIRE(tree->search(tmp)->getKey() == tmp);
+                REQUIRE(tree->getRoot()->getKey() == tmp);
+                REQUIRE(tree->getRoot() == tree->search(tmp));
+                REQUIRE(!tree->insertRoot(tmp));
+
+
+                SECTION("insert") {
+                    REQUIRE(tree->search(tmp1) == nullptr);
+                    REQUIRE(tree->insertleft(tree->search(tmp), tmp1));
+                    REQUIRE(tree->insertright(tree->search(tmp), tmp2));
+                    REQUIRE(!tree->insertleft(tree->search(tmp),tmp1));
+                    REQUIRE(!tree->insertright(tree->search(tmp),tmp2));
+                    REQUIRE(tree->search(tmp1)->getKey() == tmp1);
+                    REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+
+                    SECTION("delete") {
+                        tree->deleteNode(tmp1);
+                        REQUIRE(tree->search(tmp1) == nullptr);
+                    }
+                }
+            }
+        }
+    }
+    SECTION("Tree with root") {
+        int tmp = rand() % 500,
+                tmp1 = rand() % 500 + 500,
+                tmp2 = rand() % 500 + 500;
+        BinTree<int, std::less<int>> *tree = new BinTree<int, std::less<int>>(tmp);
+
+        SECTION("root") {
+            REQUIRE(tree->search(tmp)->getKey() == tmp);
+            REQUIRE(tree->getRoot()->getKey() == tmp);
+            REQUIRE(tree->getRoot() == tree->search(tmp));
+            REQUIRE(!tree->insertRoot(tmp));
+        }
+
+        SECTION("insert") {
+            REQUIRE(tree->search(tmp1) == nullptr);
+            REQUIRE(tree->insertleft(tree->search(tmp), tmp1));
+            REQUIRE(tree->insertright(tree->search(tmp), tmp2));
+            REQUIRE(!tree->insertleft(tree->search(tmp),tmp1));
+            REQUIRE(!tree->insertright(tree->search(tmp),tmp2));
+            REQUIRE(tree->search(tmp1)->getKey() == tmp1);
+            REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+            SECTION("delete") {
+                tree->deleteNode(tmp1);
+                REQUIRE(tree->search(tmp1) == nullptr);
+            }
+        }
+        delete tree;
+    }
+}
+
+TEST_CASE("BSTree class","[bstree]")
+{
+    SECTION("Empty tree") {
+        MultiTree<int, std::less<int>> *tree = new MultiTree<int, std::less<int>>();
+        REQUIRE(tree->getRoot() == nullptr);
+        REQUIRE(tree->search(rand()) == nullptr);
+        REQUIRE(!tree->deleteNode(rand()));
+        SECTION("Add elements") {
+            int tmp = rand() % 500,
+                    tmp1 = rand() % 500 + 500,
+                    tmp2 = rand() % 500 + 500;
+
+            SECTION("root") {
+                REQUIRE(tree->insertRoot(tmp));
+                REQUIRE(tree->search(tmp)->getKey() == tmp);
+                REQUIRE(tree->getRoot()->getKey() == tmp);
+                REQUIRE(tree->getRoot() == tree->search(tmp));
+                REQUIRE(!tree->insertRoot(tmp));
+
+
+                SECTION("insert") {
+                    REQUIRE(tree->search(tmp1) == nullptr);
+                    tree->insert(tree->search(tmp), tmp1);
+                    tree->insert(tree->search(tmp), tmp2);
+                    REQUIRE(tree->search(tmp1)->getKey() == tmp1);
+                    REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+
+                    SECTION("delete") {
+                        tree->deleteNode(tmp1);
+                        REQUIRE(tree->search(tmp1) == nullptr);
+                    }
+                }
+            }
+        }
+    }
+    SECTION("Tree with root") {
+        int tmp = rand() % 500,
+                tmp1 = rand() % 500 + 500,
+                tmp2 = rand() % 500 + 500;
+        MultiTree<int, std::less<int>> *tree = new MultiTree<int, std::less<int>>(tmp);
+
+        SECTION("root") {
+            REQUIRE(tree->search(tmp)->getKey() == tmp);
+            REQUIRE(tree->getRoot()->getKey() == tmp);
+            REQUIRE(tree->getRoot() == tree->search(tmp));
+            REQUIRE(!tree->insertRoot(tmp));
+        }
+
+        SECTION("insert") {
+            REQUIRE(tree->search(tmp1) == nullptr);
+            tree->insert(tree->search(tmp), tmp1);
+            tree->insert(tree->search(tmp), tmp2);
+            REQUIRE(tree->search(tmp1)->getKey() == tmp1);
+            REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+            SECTION("delete") {
+                tree->deleteNode(tmp1);
+                REQUIRE(tree->search(tmp1) == nullptr);
+            }
+        }
+        delete tree;
+    }
+}
+
 /*
 int main() {
     srand(time(NULL));
