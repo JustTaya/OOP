@@ -3,7 +3,10 @@
 #include "IPAddress.h"
 #include "Tree.h"
 #include "catch.hpp"
+#include <random>
+#include <ctime>
 
+//IPAdress tests
 TEST_CASE("Test IPv6", "[IPv6]") {
     std::string *ip6 = new std::string[8];
     ip6[0] = "2001";
@@ -102,11 +105,7 @@ TEST_CASE("Test IP", "[IP]") {
         REQUIRE(!ipv6_1->compare(ipv6));
     }
 }
-/* Subnet(IP *ip, unsigned mask) : ip(ip), mask(mask) {};
 
-    bool check(IP *checkIP);
-
-    bool compare(Subnet *right);    //compare the number of hosts*/
 TEST_CASE("Subnetwork test", "[subnetwork]") {
     //check
     SECTION("Check method test") {
@@ -131,7 +130,26 @@ TEST_CASE("Subnetwork test", "[subnetwork]") {
         Subnet *netw2 = new Subnet(ip, 120);
         REQUIRE(!netw1->compare(netw1));
         REQUIRE(netw2->compare(netw1));
+        REQUIRE(!netw1->compare(netw2));
     }
+}
+
+//Node tests
+TEST_CASE("MultiNode class test", "[multinode]") {
+    srand(time(NULL));
+    int tmp = rand() % 1000;
+    MultiNode<int> *node = new MultiNode<int>(tmp);
+    REQUIRE(node->getKey() == tmp);
+    REQUIRE(node->nodes.empty());
+}
+
+TEST_CASE("BinNode class test", "[binnode]") {
+    srand(time(NULL));
+    int tmp = rand() % 1000;
+    BinNode<int> *node = new BinNode<int>(tmp);
+    REQUIRE(node->getKey() == tmp);
+    REQUIRE(node->left==nullptr);
+    REQUIRE(node->right==nullptr);
 }
 
 /*
