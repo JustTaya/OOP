@@ -107,14 +107,30 @@ TEST_CASE("Test IP", "[IP]") {
     bool check(IP *checkIP);
 
     bool compare(Subnet *right);    //compare the number of hosts*/
-TEST_CASE("Subnetwork test","[subnetwork]"){
+TEST_CASE("Subnetwork test", "[subnetwork]") {
     //check
-    
-
-
+    SECTION("Check method test") {
+        unsigned ip4[4];
+        ip4[0] = 209;
+        ip4[1] = 1;
+        ip4[2] = 53;
+        ip4[3] = 165;
+        IP *ip = new IP(ip4);
+        Subnet *netw = new Subnet(ip, 128);
+        REQUIRE(netw->check(ip));
+    }
     //compare
-    SECTION("Compre method test"){
-
+    SECTION("Compare method test") {
+        unsigned ip4[4];
+        ip4[0] = 209;
+        ip4[1] = 1;
+        ip4[2] = 53;
+        ip4[3] = 165;
+        IP *ip = new IP(ip4);
+        Subnet *netw1 = new Subnet(ip, 128);
+        Subnet *netw2 = new Subnet(ip, 120);
+        REQUIRE(!netw1->compare(netw1));
+        REQUIRE(netw2->compare(netw1));
     }
 }
 
