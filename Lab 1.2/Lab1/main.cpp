@@ -239,8 +239,8 @@ TEST_CASE("BinTree class", "[bintree]") {
                     REQUIRE(tree->search(tmp1) == nullptr);
                     REQUIRE(tree->insertleft(tree->search(tmp), tmp1));
                     REQUIRE(tree->insertright(tree->search(tmp), tmp2));
-                    REQUIRE(!tree->insertleft(tree->search(tmp),tmp1));
-                    REQUIRE(!tree->insertright(tree->search(tmp),tmp2));
+                    REQUIRE(!tree->insertleft(tree->search(tmp), tmp1));
+                    REQUIRE(!tree->insertright(tree->search(tmp), tmp2));
                     REQUIRE(tree->search(tmp1)->getKey() == tmp1);
                     REQUIRE(tree->search(tmp2)->getKey() == tmp2);
 
@@ -269,8 +269,8 @@ TEST_CASE("BinTree class", "[bintree]") {
             REQUIRE(tree->search(tmp1) == nullptr);
             REQUIRE(tree->insertleft(tree->search(tmp), tmp1));
             REQUIRE(tree->insertright(tree->search(tmp), tmp2));
-            REQUIRE(!tree->insertleft(tree->search(tmp),tmp1));
-            REQUIRE(!tree->insertright(tree->search(tmp),tmp2));
+            REQUIRE(!tree->insertleft(tree->search(tmp), tmp1));
+            REQUIRE(!tree->insertright(tree->search(tmp), tmp2));
             REQUIRE(tree->search(tmp1)->getKey() == tmp1);
             REQUIRE(tree->search(tmp2)->getKey() == tmp2);
             SECTION("delete") {
@@ -282,41 +282,36 @@ TEST_CASE("BinTree class", "[bintree]") {
     }
 }
 
-TEST_CASE("BSTree class","[bstree]")
-{
+/*BSTree() : BinTree<TKey, Cmp>() {};
+
+    explicit BSTree(TKey key) : BinTree<TKey, Cmp>(key) {};
+
+    ~BSTree(){};
+
+    bool insertRoot(TKey key){this->_root=new BinNode<TKey>(key);}
+
+    bool insertNode(TKey key, Cmp cmp = Cmp());    //insert node using comparator
+
+    BinNode<TKey> *search(TKey key, Cmp cmp = Cmp()) const;
+
+    bool deleteNode(TKey key);      //delete node by key if it has one or zero sons*/
+
+TEST_CASE("BSTree class", "[bstree]") {
     SECTION("Empty tree") {
-        MultiTree<int, std::less<int>> *tree = new MultiTree<int, std::less<int>>();
-        REQUIRE(tree->getRoot() == nullptr);
-        REQUIRE(tree->search(rand()) == nullptr);
-        REQUIRE(!tree->deleteNode(rand()));
+        BSTree<int> *bsTree = new BSTree<int>();
+        bsTree->insertRoot(8);
+        //REQUIRE(tree->search(rand()) == nullptr);
+        //REQUIRE(!tree->deleteNode(rand()));
         SECTION("Add elements") {
             int tmp = rand() % 500,
                     tmp1 = rand() % 500 + 500,
                     tmp2 = rand() % 500 + 500;
 
-            SECTION("root") {
-                REQUIRE(tree->insertRoot(tmp));
-                REQUIRE(tree->search(tmp)->getKey() == tmp);
-                REQUIRE(tree->getRoot()->getKey() == tmp);
-                REQUIRE(tree->getRoot() == tree->search(tmp));
-                REQUIRE(!tree->insertRoot(tmp));
 
-
-                SECTION("insert") {
-                    REQUIRE(tree->search(tmp1) == nullptr);
-                    tree->insert(tree->search(tmp), tmp1);
-                    tree->insert(tree->search(tmp), tmp2);
-                    REQUIRE(tree->search(tmp1)->getKey() == tmp1);
-                    REQUIRE(tree->search(tmp2)->getKey() == tmp2);
-
-                    SECTION("delete") {
-                        tree->deleteNode(tmp1);
-                        REQUIRE(tree->search(tmp1) == nullptr);
-                    }
-                }
-            }
         }
     }
+
+
     SECTION("Tree with root") {
         int tmp = rand() % 500,
                 tmp1 = rand() % 500 + 500,
@@ -326,7 +321,6 @@ TEST_CASE("BSTree class","[bstree]")
         SECTION("root") {
             REQUIRE(tree->search(tmp)->getKey() == tmp);
             REQUIRE(tree->getRoot()->getKey() == tmp);
-            REQUIRE(tree->getRoot() == tree->search(tmp));
             REQUIRE(!tree->insertRoot(tmp));
         }
 
