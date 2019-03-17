@@ -282,19 +282,6 @@ TEST_CASE("BinTree class", "[bintree]") {
     }
 }
 
-/*BSTree() : BinTree<TKey, Cmp>() {};
-
-    explicit BSTree(TKey key) : BinTree<TKey, Cmp>(key) {};
-
-    ~BSTree(){};
-
-    bool insertRoot(TKey key){this->_root=new BinNode<TKey>(key);}
-
-    bool insertNode(TKey key, Cmp cmp = Cmp());    //insert node using comparator
-
-    BinNode<TKey> *search(TKey key, Cmp cmp = Cmp()) const;
-
-    bool deleteNode(TKey key);      //delete node by key if it has one or zero sons*/
 
 TEST_CASE("BSTree class", "[bstree]") {
     SECTION("Empty tree") {
@@ -347,6 +334,8 @@ TEST_CASE("BSTree class", "[bstree]") {
         delete tree;
     }
 }
+
+
 
 /*
 int main() {
