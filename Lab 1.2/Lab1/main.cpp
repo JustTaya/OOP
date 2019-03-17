@@ -298,16 +298,31 @@ TEST_CASE("BinTree class", "[bintree]") {
 
 TEST_CASE("BSTree class", "[bstree]") {
     SECTION("Empty tree") {
-        BSTree<int> *bsTree = new BSTree<int>();
-        bsTree->insertRoot(8);
-        //REQUIRE(tree->search(rand()) == nullptr);
-        //REQUIRE(!tree->deleteNode(rand()));
+        BSTree<int> *tree = new BSTree<int>();
+        REQUIRE(tree->search(rand()) == nullptr);
+        REQUIRE(!tree->deleteNode(rand()));
         SECTION("Add elements") {
             int tmp = rand() % 500,
                     tmp1 = rand() % 500 + 500,
                     tmp2 = rand() % 500 + 500;
 
+            SECTION("root") {
+                REQUIRE(tree->insertRoot(tmp));
+                REQUIRE(tree->search(tmp)->getKey() == tmp);
+                REQUIRE(!tree->insertRoot(tmp));
 
+                SECTION("insert") {
+                    REQUIRE(tree->search(tmp1) == nullptr);
+                    tree->insertNode(tmp1);
+                    tree->insertNode(tmp2);
+                    REQUIRE(tree->search(tmp1)->getKey() == tmp1);
+                    REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+                    SECTION("delete") {
+                        tree->deleteNode(tmp1);
+                        REQUIRE(tree->search(tmp1) == nullptr);
+                    }
+                }
+            }
         }
     }
 
@@ -316,18 +331,12 @@ TEST_CASE("BSTree class", "[bstree]") {
         int tmp = rand() % 500,
                 tmp1 = rand() % 500 + 500,
                 tmp2 = rand() % 500 + 500;
-        MultiTree<int, std::less<int>> *tree = new MultiTree<int, std::less<int>>(tmp);
-
-        SECTION("root") {
-            REQUIRE(tree->search(tmp)->getKey() == tmp);
-            REQUIRE(tree->getRoot()->getKey() == tmp);
-            REQUIRE(!tree->insertRoot(tmp));
-        }
+        BSTree<int> *tree = new BSTree<int>(tmp);
 
         SECTION("insert") {
             REQUIRE(tree->search(tmp1) == nullptr);
-            tree->insert(tree->search(tmp), tmp1);
-            tree->insert(tree->search(tmp), tmp2);
+            tree->insertNode(tmp1);
+            tree->insertNode(tmp2);
             REQUIRE(tree->search(tmp1)->getKey() == tmp1);
             REQUIRE(tree->search(tmp2)->getKey() == tmp2);
             SECTION("delete") {

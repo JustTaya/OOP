@@ -37,11 +37,11 @@ TKey TNode<TKey>::getKey() const {
 template<typename TKey, typename Cmp=std::less<TKey>>
 class Tree {
 public:
-    Tree(){};
+    Tree() {};
 
-    virtual ~Tree(){};
+    virtual ~Tree() {};
 
-    explicit Tree(TKey key){};
+    explicit Tree(TKey key) {};
 
     virtual bool insertRoot(TKey) = 0;
 
@@ -62,6 +62,7 @@ template<typename TKey>
 class MultiNode : public TNode<TKey> {
 public:
     explicit MultiNode(TKey key) : TNode<TKey>(key) {};
+
     ~MultiNode() {};
 
     void add(TKey key);
@@ -123,11 +124,14 @@ class BinNode : public TNode<TKey> {
 public:
     template<typename K, typename C> friend
     class BSTree;
+
     explicit BinNode(TKey key) :
             TNode<TKey>(key), left(nullptr), right(nullptr) {};
-    ~BinNode(){};
+
+    ~BinNode() {};
     BinNode<TKey> *left;
     BinNode<TKey> *right;
+
     TKey getKey() const {
         return TNode<TKey>::getKey();
     };
@@ -143,7 +147,7 @@ public:
 
     virtual ~BinTree();
 
-    bool insertRoot(TKey key);      //insert root if tree is empty
+    virtual bool insertRoot(TKey key);      //insert root if tree is empty
 
     BinNode<TKey> *insertleft(BinNode<TKey> *node, TKey key);     //insert node as left son
 
@@ -185,13 +189,19 @@ protected:
 template<typename TKey, typename Cmp=std::less<TKey>>
 class BSTree : public BinTree<TKey, Cmp> {
 public:
-    BSTree() : BinTree<TKey, Cmp>() {};
+    BSTree() :_root(nullptr) {};
 
-    explicit BSTree(TKey key) : BinTree<TKey, Cmp>(key) {};
+    explicit BSTree(TKey key) : _root(new BinNode<TKey>(key)) {};
 
-    ~BSTree(){};
+    ~BSTree() {};
 
-    bool insertRoot(TKey key){this->_root=new BinNode<TKey>(key);}
+    bool insertRoot(TKey key) {
+        if (this->_root == nullptr){
+            this->_root = new BinNode<TKey>(key);
+            return true;
+        } else
+            return false;
+    }
 
     bool insertNode(TKey key, Cmp cmp = Cmp());    //insert node using comparator
 
@@ -222,7 +232,6 @@ private:
 
 
 #include "BSTree.inc"
-
 
 
 #endif //LAB1_1_TREE_H
