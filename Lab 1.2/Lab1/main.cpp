@@ -6,6 +6,7 @@
 #include <random>
 #include <ctime>
 
+
 //IPAdress tests
 TEST_CASE("Test IPv6", "[IPv6]") {
     std::string *ip6 = new std::string[8];
@@ -70,18 +71,16 @@ TEST_CASE("Test IP", "[IP]") {
         ip4_1[2] = 53;
         ip4_1[3] = 165;
 
-        IP *ipv4 = new IP(ip4),
-                *ipv6 = new IP(ip4_1);
-        REQUIRE(!ipv4->compare(ipv6));
-        REQUIRE(!ipv6->compare(ipv4));
-        delete ipv4, ipv6;
+        IP ipv4(ip4),
+                ipv6(ip4_1);
+        REQUIRE(!ipv4.compare(&ipv6));
+        REQUIRE(!ipv6.compare(&ipv4));
     }
     SECTION("test2") {
-        IP *ipv4_1 = new IP(ip4),
-                *ipv6 = new IP(ip6);
-        REQUIRE(ipv4_1->compare(ipv6));
-        REQUIRE(!ipv6->compare(ipv4_1));
-        delete ipv4_1, ipv6;
+        IP ipv4_1(ip4),
+                ipv6(ip6);
+        REQUIRE(ipv4_1.compare(&ipv6));
+        REQUIRE(!ipv6.compare(&ipv4_1));
     }
     SECTION("test3") {
         std::string *ip6_1 = new std::string[8];
@@ -93,12 +92,11 @@ TEST_CASE("Test IP", "[IP]") {
         ip6_1[5] = "ffff";
         ip6_1[6] = "d110";
         ip6_1[7] = "35a9";
-        IP *ipv6 = new IP(ip6),
-                *ipv6_1 = new IP(ip6_1);
-        REQUIRE(ipv6->compare(ipv6_1));
-        REQUIRE(!ipv6_1->compare(ipv6));
+        IP ipv6(ip6),
+                ipv6_1(ip6_1);
+        REQUIRE(ipv6.compare(&ipv6_1));
+        REQUIRE(!ipv6_1.compare(&ipv6));
         delete[] ip6_1;
-        delete ipv6, ipv6_1;
     }
     delete[] ip6;
 }
@@ -111,10 +109,9 @@ TEST_CASE("Subnetwork test", "[subnetwork]") {
         ip4[1] = 1;
         ip4[2] = 53;
         ip4[3] = 165;
-        IP *ip = new IP(ip4);
-        Subnet *netw = new Subnet(ip, 128);
-        REQUIRE(netw->check(ip));
-        delete ip, netw;
+        IP ip(ip4);
+        Subnet netw(&ip, 128);
+        REQUIRE(netw.check(&ip));
     }
     //compare
     SECTION("Compare method test") {
@@ -123,190 +120,186 @@ TEST_CASE("Subnetwork test", "[subnetwork]") {
         ip4[1] = 1;
         ip4[2] = 53;
         ip4[3] = 165;
-        IP *ip = new IP(ip4);
-        Subnet *netw1 = new Subnet(ip, 128),
-                *netw2 = new Subnet(ip, 120);
-        REQUIRE(!netw1->compare(netw1));
-        REQUIRE(netw2->compare(netw1));
-        REQUIRE(!netw1->compare(netw2));
-        delete ip, netw1, netw2;
+        IP ip(ip4);
+        Subnet netw1(&ip, 128),
+                netw2(&ip, 120);
+        REQUIRE(!netw1.compare(&netw1));
+        REQUIRE(netw2.compare(&netw1));
+        REQUIRE(!netw1.compare(&netw2));
     }
 }
 
 //Node tests
 TEST_CASE("MultiNode class test", "[multinode]") {
     srand(time(NULL));
-    int tmp = rand() % 1000;
-    MultiNode<int> *node = new MultiNode<int>(tmp);
-    REQUIRE(node->getKey() == tmp);
-    REQUIRE(node->nodes.empty());
-    delete node;
+    int tmp = 10;
+    MultiNode<int> node(tmp);
+    REQUIRE(node.getKey() == tmp);
+    REQUIRE(node.nodes.empty());
 }
 
 TEST_CASE("BinNode class test", "[binnode]") {
     srand(time(NULL));
-    int tmp = rand() % 1000;
-    BinNode<int> *node = new BinNode<int>(tmp);
-    REQUIRE(node->getKey() == tmp);
-    REQUIRE(node->left == nullptr);
-    REQUIRE(node->right == nullptr);
-    delete node;
+    int tmp = 10;
+    BinNode<int> node(tmp);
+    REQUIRE(node.getKey() == tmp);
+    REQUIRE(node.left == nullptr);
+    REQUIRE(node.right == nullptr);
 }
+
+//TODO: fix copypaste
+//TODO: put ips and subnetworks to tree
 
 TEST_CASE("MultiTree class", "[multitree]") {
     SECTION("Empty tree") {
-        MultiTree<int, std::less<int>> *tree = new MultiTree<int, std::less<int>>();
-        REQUIRE(tree->getRoot() == nullptr);
-        REQUIRE(tree->search(rand()) == nullptr);
-        REQUIRE(!tree->deleteNode(rand()));
+        MultiTree<int, std::less<int>> tree;
+        REQUIRE(tree.getRoot() == nullptr);
+        REQUIRE(tree.search(10) == nullptr);
+        REQUIRE(!tree.deleteNode(10));
         SECTION("Add elements") {
-            int tmp = rand() % 500,
-                    tmp1 = rand() % 500 + 500,
-                    tmp2 = rand() % 500 + 500;
+            int tmp = 10,
+                    tmp1 = 3,
+                    tmp2 = 5;
 
             SECTION("root") {
-                REQUIRE(tree->insertRoot(tmp));
-                REQUIRE(tree->search(tmp)->getKey() == tmp);
-                REQUIRE(tree->getRoot()->getKey() == tmp);
-                REQUIRE(tree->getRoot() == tree->search(tmp));
-                REQUIRE(!tree->insertRoot(tmp));
+                REQUIRE(tree.insertRoot(tmp));
+                REQUIRE(tree.search(tmp)->getKey() == tmp);
+                REQUIRE(tree.getRoot()->getKey() == tmp);
+                REQUIRE(tree.getRoot() == tree.search(tmp));
+                REQUIRE(!tree.insertRoot(tmp));
 
 
                 SECTION("insert") {
-                    REQUIRE(tree->search(tmp1) == nullptr);
-                    tree->insert(tree->search(tmp), tmp1);
-                    tree->insert(tree->search(tmp), tmp2);
-                    REQUIRE(tree->search(tmp1)->getKey() == tmp1);
-                    REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+                    REQUIRE(tree.search(tmp1) == nullptr);
+                    tree.insert(tree.search(tmp), tmp1);
+                    tree.insert(tree.search(tmp), tmp2);
+                    REQUIRE(tree.search(tmp1)->getKey() == tmp1);
+                    REQUIRE(tree.search(tmp2)->getKey() == tmp2);
 
                     SECTION("delete") {
-                        tree->deleteNode(tmp1);
-                        REQUIRE(tree->search(tmp1) == nullptr);
+                        tree.deleteNode(tmp1);
+                        REQUIRE(tree.search(tmp1) == nullptr);
                     }
                 }
             }
         }
     }
     SECTION("Tree with root") {
-        int tmp = rand() % 500,
-                tmp1 = rand() % 500 + 500,
-                tmp2 = rand() % 500 + 500;
-        MultiTree<int, std::less<int>> *tree = new MultiTree<int, std::less<int>>(tmp);
+        int tmp = 10,
+                tmp1 = 3,
+                tmp2 = 5;
+        MultiTree<int, std::less<int>> tree(tmp);
 
         SECTION("root") {
-            REQUIRE(tree->search(tmp)->getKey() == tmp);
-            REQUIRE(tree->getRoot()->getKey() == tmp);
-            REQUIRE(tree->getRoot() == tree->search(tmp));
-            REQUIRE(!tree->insertRoot(tmp));
+            REQUIRE(tree.search(tmp)->getKey() == tmp);
+            REQUIRE(tree.getRoot()->getKey() == tmp);
+            REQUIRE(tree.getRoot() == tree.search(tmp));
+            REQUIRE(!tree.insertRoot(tmp));
         }
 
         SECTION("insert") {
-            REQUIRE(tree->search(tmp1) == nullptr);
-            tree->insert(tree->search(tmp), tmp1);
-            tree->insert(tree->search(tmp), tmp2);
-            REQUIRE(tree->search(tmp1)->getKey() == tmp1);
-            REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+            REQUIRE(tree.search(tmp1) == nullptr);
+            tree.insert(tree.search(tmp), tmp1);
+            tree.insert(tree.search(tmp), tmp2);
+            REQUIRE(tree.search(tmp1)->getKey() == tmp1);
+            REQUIRE(tree.search(tmp2)->getKey() == tmp2);
             SECTION("delete") {
-                tree->deleteNode(tmp1);
-                REQUIRE(tree->search(tmp1) == nullptr);
+                tree.deleteNode(tmp1);
+                REQUIRE(tree.search(tmp1) == nullptr);
             }
         }
-        delete tree;
     }
 }
 
 
 TEST_CASE("BinTree class", "[bintree]") {
     SECTION("Empty tree") {
-        BinTree<int, std::less<int>> *tree = new BinTree<int, std::less<int>>();
-        REQUIRE(tree->getRoot() == nullptr);
-        REQUIRE(tree->search(rand()) == nullptr);
-        REQUIRE(!tree->deleteNode(rand()));
+        BinTree<int, std::less<int>> tree;
+        REQUIRE(tree.getRoot() == nullptr);
+        REQUIRE(tree.search(10) == nullptr);
+        REQUIRE(!tree.deleteNode(10));
         SECTION("Add elements") {
-            int tmp = rand() % 500,
-                    tmp1 = rand() % 500 + 500,
-                    tmp2 = rand() % 500 + 500;
-
+            int tmp = 10,
+                    tmp1 = 3,
+                    tmp2 = 5;
             SECTION("root") {
-                REQUIRE(tree->insertRoot(tmp));
-                REQUIRE(tree->search(tmp)->getKey() == tmp);
-                REQUIRE(tree->getRoot()->getKey() == tmp);
-                REQUIRE(tree->getRoot() == tree->search(tmp));
-                REQUIRE(!tree->insertRoot(tmp));
+                REQUIRE(tree.insertRoot(tmp));
+                REQUIRE(tree.search(tmp)->getKey() == tmp);
+                REQUIRE(tree.getRoot()->getKey() == tmp);
+                REQUIRE(tree.getRoot() == tree.search(tmp));
+                REQUIRE(!tree.insertRoot(tmp));
 
 
                 SECTION("insert") {
-                    REQUIRE(tree->search(tmp1) == nullptr);
-                    REQUIRE(tree->insertleft(tree->search(tmp), tmp1));
-                    REQUIRE(tree->insertright(tree->search(tmp), tmp2));
-                    REQUIRE(!tree->insertleft(tree->search(tmp), tmp1));
-                    REQUIRE(!tree->insertright(tree->search(tmp), tmp2));
-                    REQUIRE(tree->search(tmp1)->getKey() == tmp1);
-                    REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+                    REQUIRE(tree.search(tmp1) == nullptr);
+                    REQUIRE(tree.insertleft(tree.search(tmp), tmp1));
+                    REQUIRE(tree.insertright(tree.search(tmp), tmp2));
+                    REQUIRE(!tree.insertleft(tree.search(tmp), tmp1));
+                    REQUIRE(!tree.insertright(tree.search(tmp), tmp2));
+                    REQUIRE(tree.search(tmp1)->getKey() == tmp1);
+                    REQUIRE(tree.search(tmp2)->getKey() == tmp2);
 
                     SECTION("delete") {
-                        tree->deleteNode(tmp1);
-                        REQUIRE(tree->search(tmp1) == nullptr);
+                        tree.deleteNode(tmp1);
+                        REQUIRE(tree.search(tmp1) == nullptr);
                     }
                 }
             }
         }
     }
     SECTION("Tree with root") {
-        int tmp = rand() % 500,
-                tmp1 = rand() % 500 + 500,
-                tmp2 = rand() % 500 + 500;
-        BinTree<int, std::less<int>> *tree = new BinTree<int, std::less<int>>(tmp);
+        int tmp = 10,
+                tmp1 = 3,
+                tmp2 = 5;
+        BinTree<int, std::less<int>> tree(tmp);
 
         SECTION("root") {
-            REQUIRE(tree->search(tmp)->getKey() == tmp);
-            REQUIRE(tree->getRoot()->getKey() == tmp);
-            REQUIRE(tree->getRoot() == tree->search(tmp));
-            REQUIRE(!tree->insertRoot(tmp));
+            REQUIRE(tree.search(tmp)->getKey() == tmp);
+            REQUIRE(tree.getRoot()->getKey() == tmp);
+            REQUIRE(tree.getRoot() == tree.search(tmp));
+            REQUIRE(!tree.insertRoot(tmp));
         }
 
         SECTION("insert") {
-            REQUIRE(tree->search(tmp1) == nullptr);
-            REQUIRE(tree->insertleft(tree->search(tmp), tmp1));
-            REQUIRE(tree->insertright(tree->search(tmp), tmp2));
-            REQUIRE(!tree->insertleft(tree->search(tmp), tmp1));
-            REQUIRE(!tree->insertright(tree->search(tmp), tmp2));
-            REQUIRE(tree->search(tmp1)->getKey() == tmp1);
-            REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+            REQUIRE(tree.search(tmp1) == nullptr);
+            REQUIRE(tree.insertleft(tree.search(tmp), tmp1));
+            REQUIRE(tree.insertright(tree.search(tmp), tmp2));
+            REQUIRE(!tree.insertleft(tree.search(tmp), tmp1));
+            REQUIRE(!tree.insertright(tree.search(tmp), tmp2));
+            REQUIRE(tree.search(tmp1)->getKey() == tmp1);
+            REQUIRE(tree.search(tmp2)->getKey() == tmp2);
             SECTION("delete") {
-                tree->deleteNode(tmp1);
-                REQUIRE(tree->search(tmp1) == nullptr);
+                tree.deleteNode(tmp1);
+                REQUIRE(tree.search(tmp1) == nullptr);
             }
         }
-        delete tree;
     }
 }
 
 
 TEST_CASE("BSTree class", "[bstree]") {
     SECTION("Empty tree") {
-        BSTree<int> *tree = new BSTree<int>();
-        REQUIRE(tree->search(rand()) == nullptr);
-        REQUIRE(!tree->deleteNode(rand()));
+        BSTree<int> tree;
+        REQUIRE(tree.search(10) == nullptr);
+        REQUIRE(!tree.deleteNode(10));
         SECTION("Add elements") {
-            int tmp = rand() % 500,
-                    tmp1 = rand() % 500 + 500,
-                    tmp2 = rand() % 500 + 500;
-
+            int tmp = 10,
+                    tmp1 = 3,
+                    tmp2 = 5;
             SECTION("root") {
-                REQUIRE(tree->insertRoot(tmp));
-                REQUIRE(tree->search(tmp)->getKey() == tmp);
-                REQUIRE(!tree->insertRoot(tmp));
+                REQUIRE(tree.insertRoot(tmp));
+                REQUIRE(tree.search(tmp)->getKey() == tmp);
+                REQUIRE(!tree.insertRoot(tmp));
 
                 SECTION("insert") {
-                    REQUIRE(tree->search(tmp1) == nullptr);
-                    tree->insertNode(tmp1);
-                    tree->insertNode(tmp2);
-                    REQUIRE(tree->search(tmp1)->getKey() == tmp1);
-                    REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+                    REQUIRE(tree.search(tmp1) == nullptr);
+                    tree.insertNode(tmp1);
+                    tree.insertNode(tmp2);
+                    REQUIRE(tree.search(tmp1)->getKey() == tmp1);
+                    REQUIRE(tree.search(tmp2)->getKey() == tmp2);
                     SECTION("delete") {
-                        tree->deleteNode(tmp1);
-                        REQUIRE(tree->search(tmp1) == nullptr);
+                        tree.deleteNode(tmp1);
+                        REQUIRE(tree.search(tmp1) == nullptr);
                     }
                 }
             }
@@ -315,23 +308,22 @@ TEST_CASE("BSTree class", "[bstree]") {
 
 
     SECTION("Tree with root") {
-        int tmp = rand() % 500,
-                tmp1 = rand() % 500 + 500,
-                tmp2 = rand() % 500 + 500;
-        BSTree<int> *tree = new BSTree<int>(tmp);
+        int tmp = 10,
+                tmp1 = 3,
+                tmp2 = 5;
+        BSTree<int> tree(tmp);
 
         SECTION("insert") {
-            REQUIRE(tree->search(tmp1) == nullptr);
-            tree->insertNode(tmp1);
-            tree->insertNode(tmp2);
-            REQUIRE(tree->search(tmp1)->getKey() == tmp1);
-            REQUIRE(tree->search(tmp2)->getKey() == tmp2);
+            REQUIRE(tree.search(tmp1) == nullptr);
+            tree.insertNode(tmp1);
+            tree.insertNode(tmp2);
+            REQUIRE(tree.search(tmp1)->getKey() == tmp1);
+            REQUIRE(tree.search(tmp2)->getKey() == tmp2);
             SECTION("delete") {
-                tree->deleteNode(tmp1);
-                REQUIRE(tree->search(tmp1) == nullptr);
+                tree.deleteNode(tmp1);
+                REQUIRE(tree.search(tmp1) == nullptr);
             }
         }
-        delete tree;
     }
 }
 
