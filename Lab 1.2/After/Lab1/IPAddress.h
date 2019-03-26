@@ -5,94 +5,85 @@
 #ifndef LAB1_1_IPADRESS_H
 #define LAB1_1_IPADRESS_H
 
+
 #include <iostream>
+#include <string>
 #include <bitset>
-#include <random>
-#include <ctime>
-#include <cmath>
+#include <vector>
 
-
-enum IPversion {
-    v4, v6
-};
-
-class IPv6 {
-public:
-    explicit IPv6(std::string *ip);
-
-    std::bitset<128> getBinary();
-
-    void print();
-
-    friend class IP;
-
-private:
-    std::string octet[8];
-
-    void compress();    //zeros can be omitted
-    void transform();    //add omitted zeros
-};
-
-class IPv4 {
-public:
-    explicit IPv4(unsigned ip[4]);
-
-    std::bitset<32> getBinary();   //IPv4 in binary form
-    void print();
-
-    IPv6 *converttoIPv6();
-
-    friend class IP;
-
-private:
-    unsigned octet[4];  //4 decimal numbers from 0 to 255
-
-};
 
 class IP {
 public:
-    IP();
+    virtual std::string getBinary() const = 0;
 
-    explicit IP(unsigned ip[4]);
+    virtual ~IP() = 0;
 
-    explicit IP(std::string *ip);
+protected:
+    virtual void setRandom() = 0;
 
-    void print();
-
-    bool compare(IP *right);  //return true if current IP is less
-    friend class Subnet;
-
-private:
-    IPversion version;
-    union {
-        IPv4 *ipv4;
-        IPv6 *ipv6;
-    } address;
-
-    void getRandom();
-
-    void getRandomIPv4();
-
-    void getRandomIPv6();
+    virtual void setBinary() = 0;
 };
 
-//subnet class in CIDR notation
+class IPv4 : public IP {
+public:
+    IPv4();
+
+    explicit IPv4(const std::vector<unsigned> &ip);
+
+    IPv4(const IPv4 &ip);
+
+    std::string getBinary() const override;
+
+private:
+    std::vector<unsigned> octet;
+
+    std::bitset<32> binary;
+
+    void setRandom() override;
+
+    void setBinary() override;
+};
+
+class IPv6 : public IP {
+public:
+    IPv6();
+
+    IPv6(const std::vector<std::string> &ip);
+
+    IPv6(const IPv6 &ip);
+
+//    IPv6(const IPv4& ip);
+
+    std::string getBinary() const override;
+
+private:
+    std::vector<std::string> octet;
+    std::bitset<128> binary;
+
+    void setRandom() override;
+
+    void setBinary() override;
+
+    void compress();
+
+    void decompress();
+};
+
 class Subnet {
 public:
-    Subnet();
+    Subnet(const IP *ip, unsigned mask) : ip(ip), mask(mask) {};
 
-    Subnet(IP *ip, unsigned mask) : ip(ip), mask(mask) {};
+    ~Subnet();
 
-    bool check(IP *checkIP);
+    bool check(const IP *ip);
 
-    bool compare(Subnet *right);    //compare the number of hosts
+    void getBinary();
 
-    void print();
+    void getIPNumber();
 
 private:
-    IP *ip;  //ip address
-    unsigned mask;  //subnet mask
+    const IP *ip;
+    const unsigned mask;
 };
-
 
 #endif //LAB1_1_IPADRESS_H

@@ -7,189 +7,7 @@
 #include "IPAddress.h"
 #include "Convert.h"
 
-IPv4::IPv4(unsigned int *ip) {
-    for (size_t i = 0; i < 4; i++)
-        octet[i] = ip[i];
-}
-
-std::bitset<32> IPv4::getBinary() {
-    std::bitset<32> binary;
-    int it = 0;
-    int tmp = 0;
-    for (int i = 3; i >= 0; i--) {
-        tmp = this->octet[i];
-        for (int j = 0; j < 8; j++) {
-            if (tmp % 2 == 0)
-                binary[it] = 0;
-            else
-                binary[it] = 1;
-            it++;
-            tmp /= 2;
-        }
-    }
-    return binary;
-}
-
-void IPv4::print() {
-    std::cout << octet[0] << ":" << octet[1] << ":" << octet[2] << ":" << octet[3];
-}
-
-IPv6 *IPv4::converttoIPv6() {
-    int n = 0, tmp = 0, it = 7;
-    std::string *ip = new std::string[8], buff;
-    buff.resize(8, '0');
-    for (int i = 3; i >= 0; i--) {
-        n = this->octet[i];
-        it=7-(3-i)*2;
-        while (n != 0) {
-            tmp = n % 16;
-            n /= 16;
-            buff[it] = dectoHex[tmp];
-            it--;
-        }
-    }
-    ip[5]="ffff";
-    ip[6].append(buff.substr(0, 4));
-    ip[7].append(buff.substr(4, 4));
-    IPv6 *ip6 = new IPv6(ip);
-    return ip6;
-}
-
-
-IPv6::IPv6(std::string *ip) {
-    for (size_t i = 0; i < 8; i++)
-        octet[i] = ip[i];
-    this->compress();
-}
-
-std::bitset<128> IPv6::getBinary() {
-    std::bitset<128> binary;
-    int it = 0;
-    std::string tmp, buff;
-    transform();
-    for (int i = 7; i >= 0; i--) {
-        tmp = this->octet[i];
-        for (int j = 3; j >= 0; j--) {
-            buff = hextoBin[tmp[j]];
-            for (int k = 3; k >= 0; k--) {
-                if (buff[k] == '0')
-                    binary[it] = 0;
-                else
-                    binary[it] = 1;
-                it++;
-            }
-        }
-    }
-    compress();
-    return binary;
-}
-
-void IPv6::transform() {
-    for (size_t i = 0; i < 8; i++) {
-        if (octet[i].length() < 4)
-            while (octet[i].length() < 4)
-                octet[i].insert(0, "0");
-    }
-}
-
-void IPv6::compress() {
-    for (size_t i = 0; i < 8; i++) {
-        while (octet[i][0] == '0')
-            octet[i].erase(0, 1);
-    }
-}
-
-void IPv6::print() {
-    this->compress();
-    std::cout << octet[0] << ":" << octet[1] << ":" << octet[2] << ":" << octet[3] << ":" <<
-              octet[4] << ":" << octet[5] << ":" << octet[6] << ":" << octet[7];
-}
-
-IP::IP() {
-    getRandom();
-}
-
-IP::IP(unsigned int *ip) {
-    this->version = v4;
-    this->address.ipv4 = new IPv4(ip);
-}
-
-IP::IP(std::string *ip) {
-    this->version = v6;
-    this->address.ipv6 = new IPv6(ip);
-}
-
-void IP::print() {
-    if (this->version == v4)
-        this->address.ipv4->print();
-    else
-        this->address.ipv6->print();
-}
-
-void IP::getRandom() {
-    int type = rand() % 2;
-    if (type == 0) {
-        this->version = v4;
-        this->getRandomIPv4();
-    } else {
-        this->version = v6;
-        this->getRandomIPv6();
-    }
-}
-
-void IP::getRandomIPv4() {
-    unsigned ip[4];
-    for (size_t i = 0; i < 4; i++) {
-        ip[i] = rand() % 256;
-    }
-    this->address.ipv4 = new IPv4(ip);
-}
-
-void IP::getRandomIPv6() {
-    std::string *ip = new std::string[8];
-    int n = 0, tmp = 0;
-    for (size_t i = 0; i < 8; i++) {
-        tmp = rand() % 16;
-        if (tmp < 10)
-            ip[i].push_back(tmp + 48);
-        else
-            ip[i].push_back(tmp + 87);
-    }
-    this->address.ipv6 = new IPv6(ip);
-}
-
-bool IP::compare(IP *right) {
-    if (this->version != right->version) {
-        IPv6 *l, *r;     //left and right values for comparator
-        if (this->version == v4) {
-            l = this->address.ipv4->converttoIPv6();
-            r = right->address.ipv6;
-        } else {
-            l = this->address.ipv6;
-            r = right->address.ipv4->converttoIPv6();
-        }
-        for (size_t i = 0; i < 8; i++)
-            if (l->octet[i] < r->octet[i])
-                return true;
-            else if (l->octet[i] > r->octet[i])
-                return false;
-    } else {
-        if (this->version == v4) {
-            for (size_t i = 0; i < 4; i++)
-                if (this->address.ipv4->octet[i] < right->address.ipv4->octet[i])
-                    return true;
-                else if (this->address.ipv4->octet[i] > right->address.ipv4->octet[i])
-                    return false;
-        } else {
-            for (size_t i = 0; i < 8; i++)
-                if (this->address.ipv6->octet[i] < right->address.ipv6->octet[i])
-                    return true;
-                else if (this->address.ipv6->octet[i] > right->address.ipv6->octet[i])
-                    return false;
-        }
-    }
-    return false;
-}
+/*
 
 Subnet::Subnet() {
     this->ip = new IP();
@@ -257,4 +75,103 @@ void Subnet::print() {
     this->ip->print();
     std::cout << "/" << this->mask;
 }
+
+*/
+IPv4::IPv4() : octet(std::vector<unsigned>(4, 0)) {
+    setRandom();
+    setBinary();
+}
+
+IPv4::IPv4(const std::vector<unsigned int> &ip) : octet(std::vector<unsigned>(4, 0)) {
+    for (size_t i = 0; (i < 4) && i < ip.size(); i++)
+        octet[i] = ip[i];
+    setBinary();
+}
+
+IPv4::IPv4(const IPv4 &ip) : octet(ip.octet), binary(ip.binary) {}
+
+std::string IPv4::getBinary() const {
+    return this->binary.to_string();
+}
+
+void IPv4::setRandom() {
+    for (size_t i = 0; i < 4; i++) {
+        this->octet[i] = rand() % 256;
+    }
+}
+
+void IPv4::setBinary() {
+    int it = 0;
+    int tmp = 0;
+    for (int i = 3; i >= 0; i--) {
+        tmp = this->octet[i];
+        for (int j = 0; j < 8; j++) {
+            if (tmp % 2 == 0)
+                this->binary[it] = 0;
+            else
+                this->binary[it] = 1;
+            it++;
+            tmp /= 2;
+        }
+    }
+}
+
+IPv6::IPv6() : octet(std::vector<std::string>(8, "")) {
+    setRandom();
+    setBinary();
+}
+
+IPv6::IPv6(const std::vector<std::string> &ip) {
+    for (size_t i = 0; (i < 8) && (i < ip.size()); i++)
+        octet[i] = ip[i];
+    setBinary();
+    compress();
+}
+
+IPv6::IPv6(const IPv6 &ip) : octet(ip.octet), binary(ip.binary) {}
+
+std::string IPv6::getBinary() const {
+    return this->binary.to_string();
+}
+
+void IPv6::setRandom() {
+    int n = 0, tmp = 0;
+    for (size_t i = 0; i < 8; i++) {
+        tmp = rand() % 16;
+        if (tmp < 10)
+            this->octet[i].push_back(tmp + 48);
+        else
+            this->octet[i].push_back(tmp + 87);
+    }
+}
+
+void IPv6::setBinary() {
+    int it = 0;
+    std::string tmp, buff;
+    for (int i = 7; i >= 0; i--) {
+        tmp = this->octet[i];
+        for (int j = 3; j >= 0; j--) {
+            buff = hextoBin[tmp[j]];
+            for (int k = 3; k >= 0; k--) {
+                if (buff[k] == '0')
+                    this->binary[it] = 0;
+                else
+                    this->binary[it] = 1;
+                it++;
+            }
+        }
+    }
+}
+
+void IPv6::compress() {
+    for (size_t i = 0; i < 8; i++) {
+        while (this->octet[i][0] == '0')
+            this->octet[i].erase(0, 1);
+    }
+}
+
+void IPv6::decompress() {
+
+}
+
 

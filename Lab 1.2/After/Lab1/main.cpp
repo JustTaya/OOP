@@ -6,7 +6,17 @@
 #include <random>
 #include <ctime>
 
+TEST_CASE("Test IPv4", "[IPv4]"){
+    std::vector<unsigned >ip4{209,2,53,165};
+    ip4[0] = 209;
+    ip4[1] = 1;
+    ip4[2] = 53;
+    ip4[3] = 165;
+    IPv4 ip(ip4);
+    //REQUIRE(ip.getBinary() == std::bitset<32>("11010001000000010011010110100101"));
+}
 
+/*
 //IPAdress tests
 TEST_CASE("Test IPv6", "[IPv6]") {
     std::string *ip6 = new std::string[8];
@@ -328,7 +338,7 @@ TEST_CASE("BSTree class", "[bstree]") {
 }
 
 
-
+*/
 /*
 int main() {
     srand(time(NULL));

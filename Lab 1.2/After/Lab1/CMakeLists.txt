@@ -17,5 +17,4 @@ add_executable(Lab1
         MultiTree.inc
         Samples.h
         Tree.h
-        IP.h
-        IP.cpp)
+        )
