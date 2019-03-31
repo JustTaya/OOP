@@ -47,8 +47,7 @@ TEST_CASE("Test IPv4", "[IPv4]") {
 }
 
 TEST_CASE("Test IP", "[IP]") {
-
-    unsigned ip4[4];
+unsigned ip4[4];
     ip4[0] = 209;
     ip4[1] = 1;
     ip4[2] = 53;
