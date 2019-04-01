@@ -12,8 +12,10 @@
 #include <bitset>
 #include <vector>
 
-class IPFactory;
-
+class IPParser{
+    virtual std::string parse(const std::string &ip) = 0;
+};
+/*
 class IPParser {
 public:
     virtual std::string parse(const std::string &ip) = 0;
@@ -135,5 +137,5 @@ private:
     const IP *ip;
     const unsigned mask;
 };
-
+*/
 #endif //LAB1_1_IPADRESS_H
