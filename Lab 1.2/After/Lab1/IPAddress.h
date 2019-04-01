@@ -7,10 +7,38 @@
 
 
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <bitset>
 #include <vector>
 
+class IPFactory;
+
+class IPParser {
+public:
+    virtual std::string parse(const std::string &ip) = 0;
+
+protected:
+    std::vector<std::string> split(const std::string &ip,  const char delimiter);
+
+    virtual std::string parseLexem(std::string) = 0;
+};
+
+class IPv4Parser : public IPParser {
+public:
+    std::string parse(const std::string &ip) override;
+
+private:
+    std::string parseLexem(std::string) override;
+};
+
+class IPv6Parser : public IPParser {
+public:
+    std::string parse(const std::string &ip) override;
+
+private:
+    std::string parseLexem(std::string) override;
+};
 
 class IP {
 public:
@@ -19,6 +47,8 @@ public:
     virtual ~IP() = 0;
 
 protected:
+    static IPFactory factory;
+
     virtual void setRandom() = 0;
 
     virtual void setBinary() = 0;
@@ -26,15 +56,21 @@ protected:
 
 class IPv4 : public IP {
 public:
+
+    std::string getBinary() const override;
+
+    friend class IPFactory;
+
+private:
     IPv4();
+
+    IPv4(const std::string &ip);
 
     explicit IPv4(const std::vector<unsigned> &ip);
 
     IPv4(const IPv4 &ip);
 
-    std::string getBinary() const override;
 
-private:
     std::vector<unsigned> octet;
 
     std::bitset<32> binary;
@@ -56,17 +92,31 @@ public:
 
     std::string getBinary() const override;
 
+    friend class IPFactory;
+
 private:
+    IPv6(const std::string &ip, const std::binary &binary);
+
     std::vector<std::string> octet;
     std::bitset<128> binary;
 
     void setRandom() override;
 
     void setBinary() override;
+};
 
-    void compress();
+class IPFactory {
+public:
+    static IP newIP4(const std::string &ip) {
+        return IPv4(ip);
+    };
 
-    void decompress();
+    static IP newIP6(const std::string &ip) {
+        return IPv6(ip);
+    };
+private:
+    static IPv4Parser ipv4Parser;
+    static IPv4Parser ipv6Parser;
 };
 
 class Subnet {
