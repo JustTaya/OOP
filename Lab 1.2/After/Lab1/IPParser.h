@@ -13,6 +13,9 @@
 
 #include <iostream>
 
+typedef bool (*Convertor)(std::istringstream &, unsigned &);
+
+
 class IPParser {
 public:
     IPParser();
@@ -27,11 +30,14 @@ private:
     };
     std::array<unsigned, count> octetNumb;
     std::array<unsigned, count> octetMax;
+    std::array<Convertor, count> convertor;
 
     std::vector<std::string> splitIPv4(const std::string &ip, const char delimiter);
+
     std::vector<std::string> splitIPv6(const std::string &ip, const char delimiter);
 
-    std::vector<unsigned> parseTokens(const std::vector<std::string> &tokens,const Version v);
+
+    std::vector<unsigned> parseTokens(const std::vector<std::string> &tokens, const Version v);
 
     static bool parseIPv4Token(std::istringstream &iss, unsigned &parsed);
 

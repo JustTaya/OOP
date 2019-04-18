@@ -10,6 +10,9 @@ IPParser::IPParser() {
 
     octetMax[ipv4] = 255;
     octetMax[ipv6] = 65535;
+
+    convertor[ipv4] = &parseIPv4Token;
+    convertor[ipv6] = &parseIPv6Token;
 }
 
 std::vector<unsigned> IPParser::parse(const std::string &ip) {
@@ -78,20 +81,9 @@ IPParser::parseTokens(const std::vector<std::string> &tokens, const Version v) {
     auto parsed = std::vector<unsigned>(octetNumb[v], 0);
     unsigned tmp, j = 0;
 
-    typedef bool (*Convertor)(std::istringstream &, unsigned &);
-    Convertor convertor;
-    switch (v) {
-        case ipv4:
-            convertor = &parseIPv4Token;
-            break;
-        case ipv6:
-            convertor = &parseIPv6Token;
-            break;
-    }
-
     for (auto i:tokens) {
         std::istringstream iss(i);
-        if (convertor(iss, tmp)) {
+        if (convertor[v](iss, tmp)) {
             if (tmp <= octetMax[v])
                 parsed[j] = tmp;
             else
@@ -116,4 +108,6 @@ bool IPParser::parseIPv6Token(std::istringstream &iss, unsigned &parsed) {
         return true;
     return false;
 }
+
+
 
