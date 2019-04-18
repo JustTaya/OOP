@@ -28,9 +28,8 @@ private:
     std::array<unsigned, count> octetNumb;
     std::array<unsigned, count> octetMax;
 
-    std::vector<std::string> IPParser::splitIPv4(const std::string &ip, const char delimiter);
-    std::vector<std::string> IPParser::splitIPv6(const std::string &ip, const char delimiter);
-
+    std::vector<std::string> splitIPv4(const std::string &ip, const char delimiter);
+    std::vector<std::string> splitIPv6(const std::string &ip, const char delimiter);
 
     std::vector<unsigned> parseTokens(const std::vector<std::string> &tokens,const Version v);
 
