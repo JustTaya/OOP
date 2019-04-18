@@ -10,7 +10,7 @@
 
 TEST_CASE("Parser", "[parser]") {
     auto parser = IPParser();
-    /*SECTION("IPv4") {
+    SECTION("IPv4") {
         auto parsed = parser.parse("192.0.2.235");
         REQUIRE(parsed.size() == 4);
         REQUIRE(parsed[0] == 192);
@@ -63,11 +63,8 @@ TEST_CASE("Parser", "[parser]") {
         REQUIRE(parsed.empty());
     }
 
-
     SECTION("not ip") {
         auto parsed = parser.parse("abc.abc");
         REQUIRE(parsed.empty());
     }
-    //REQUIRE( Factorial(1) == 1 );
-     */
 }
