@@ -21,7 +21,7 @@ public:
     virtual std::string getBinary() = 0;
 
 protected:
-    virtual std::string setBinary(const std::vector<unsigned>& _ip) = 0;
+    virtual void setBinary(const std::vector<unsigned>& _ip) = 0;
 };
 
 class IPv4 : public IP {
@@ -38,7 +38,7 @@ private:
     std::vector<unsigned> ip;
     std::string binary;
 
-    std::string setBinary(const std::vector<unsigned>& _ip) override;
+    void setBinary(const std::vector<unsigned>& _ip) override;
 };
 
 class IPv6 : public IP {
@@ -55,7 +55,7 @@ private:
     std::vector<unsigned> ip;
     std::string binary;
 
-    std::string setBinary(const std::vector<unsigned>& _ip) override;
+    void setBinary(const std::vector<unsigned>& _ip) override;
 };
 
 class IPFabric {

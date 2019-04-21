@@ -4,26 +4,36 @@
 
 #include "IPAddress.h"
 
-IPv4::IPv4(std::vector<unsigned int> _ip) : ip(std::move(_ip)), binary(setBinary(_ip)) {
+IPv4::IPv4(std::vector<unsigned int> _ip) : ip(std::move(_ip)) {
+    setBinary(ip);
 }
 
 std::string IPv4::getBinary() {
     return binary;
 }
 
-std::string IPv4::setBinary(const std::vector<unsigned> &_ip) {
-    return std::string();
+void IPv4::setBinary(const std::vector<unsigned> &_ip) {
+    std::string newBinary;
+    for (auto i:_ip) {
+        newBinary += std::bitset<8>(i).to_string();
+    }
+    binary = newBinary;
 }
 
-IPv6::IPv6(std::vector<unsigned int> _ip) : ip(std::move(_ip)), binary(setBinary(_ip)) {
+IPv6::IPv6(std::vector<unsigned int> _ip) : ip(std::move(_ip)) {
+    setBinary(ip);
 }
 
 std::string IPv6::getBinary() {
     return binary;
 }
 
-std::string IPv6::setBinary(const std::vector<unsigned> &_ip) {
-    return std::string();
+void IPv6::setBinary(const std::vector<unsigned> &_ip) {
+    std::string newBinary;
+    for (auto i:_ip) {
+        newBinary += std::bitset<16>(i).to_string();
+    }
+    binary = newBinary;
 }
 
 std::unique_ptr<IP> IPFabric::newIP(const std::string &ip) {
