@@ -5,8 +5,8 @@
 #include "IPParser.h"
 
 IPParser::IPParser() {
-    octetNumb[ipv4] = 4;
-    octetNumb[ipv6] = 8;
+    octetNumber[ipv4] = 4;
+    octetNumber[ipv6] = 8;
 
     octetMax[ipv4] = 255;
     octetMax[ipv6] = 65535;
@@ -17,7 +17,7 @@ IPParser::IPParser() {
 
 std::vector<unsigned> IPParser::parse(const std::string &ip) {
     //get delimiter
-    unsigned pos = ip.find_first_of(":.");
+    unsigned pos = ip.find_first_of(".:");
     if (pos == std::string::npos)
         return std::vector<unsigned int>();
 
@@ -49,7 +49,7 @@ std::vector<std::string> IPParser::splitIPv4(const std::string &ip, const char d
 std::vector<std::string> IPParser::splitIPv6(const std::string &ip, const char delimiter) {
     std::vector<std::string> tokens,
             buffer;
-    tokens.reserve(octetNumb[ipv6]);
+    tokens.reserve(octetNumber[ipv6]);
     std::string token;
     std::istringstream tokenStream(ip);
     //ipv6 can consist "::"
@@ -66,19 +66,19 @@ std::vector<std::string> IPParser::splitIPv6(const std::string &ip, const char d
     }
 
     //count shift after ::
-    if (buffer.size() > octetNumb[ipv6])
+    if (buffer.size() > octetNumber[ipv6])
         return std::vector<std::string>();
-    tokens.resize(octetNumb[ipv6] - buffer.size(), "0");
+    tokens.resize(octetNumber[ipv6] - buffer.size(), "0");
     tokens.insert(tokens.end(), buffer.begin(), buffer.end());
     return tokens;
 }
 
 std::vector<unsigned>
 IPParser::parseTokens(const std::vector<std::string> &tokens, const Version v) {
-    if (tokens.size() != octetNumb[v])
+    if (tokens.size() != octetNumber[v])
         return std::vector<unsigned>();
 
-    auto parsed = std::vector<unsigned>(octetNumb[v], 0);
+    auto parsed = std::vector<unsigned>(octetNumber[v], 0);
     unsigned tmp, j = 0;
 
     for (auto i:tokens) {
@@ -108,6 +108,3 @@ bool IPParser::parseIPv6Token(std::istringstream &iss, unsigned &parsed) {
         return true;
     return false;
 }
-
-
-

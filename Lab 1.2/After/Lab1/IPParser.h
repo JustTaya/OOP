@@ -26,16 +26,15 @@ public:
 
 private:
     enum Version {
-        ipv4, ipv6, count
+        ipv4=0, ipv6, count=2
     };
-    std::array<unsigned, count> octetNumb;
-    std::array<unsigned, count> octetMax;
-    std::array<Convertor, count> convertor;
+    std::array<unsigned, count> octetNumber{};
+    std::array<unsigned, count> octetMax{};
+    std::array<Convertor, count> convertor{};
 
-    std::vector<std::string> splitIPv4(const std::string &ip, const char delimiter);
+    static std::vector<std::string> splitIPv4(const std::string &ip, const char delimiter);
 
     std::vector<std::string> splitIPv6(const std::string &ip, const char delimiter);
-
 
     std::vector<unsigned> parseTokens(const std::vector<std::string> &tokens, const Version v);
 
