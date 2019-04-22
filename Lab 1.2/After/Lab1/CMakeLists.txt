@@ -12,4 +12,8 @@ add_executable(Lab1 main.cpp
         IPParser.cpp
         IPParser.h
         IPFactory.h
-        IPFactory.cpp)
+        IPFactory.cpp
+        IPConvertor.h
+        IPConvertor.cpp
+        IPComparator.h
+        IPComparator.cpp)

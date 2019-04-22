@@ -22,9 +22,14 @@ void IPv4::setBinary(const std::vector<unsigned> &_ip) {
 
 void IPv4::print(std::ostringstream &oss) {
     for (std::size_t i = 0; i < ip.size() - 1; ++i) {
-        oss << ip[i] << '.';
+        oss << std::hex << ip[i];
+        oss << '.';
     }
     oss << ip.back();
+}
+
+std::vector<unsigned> IPv4::getIP() {
+    return ip;
 }
 
 std::size_t IPv6::findPos() {
@@ -80,6 +85,10 @@ void IPv6::print(std::ostringstream &oss) {
                 oss << ':';
         }
     }
+}
+
+std::vector<unsigned> IPv6::getIP() {
+    return ip;
 }
 
 

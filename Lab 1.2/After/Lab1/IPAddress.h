@@ -20,6 +20,8 @@ public:
 
     virtual std::string getBinary() = 0;
 
+    virtual std::vector<unsigned> getIP() = 0;
+
     virtual void print(std::ostringstream &oss) = 0;
 
 protected:
@@ -35,6 +37,8 @@ class IPv4 : public IP {
 
 public:
     ~IPv4() override = default;
+
+    std::vector<unsigned> getIP() override;
 
     std::string getBinary() override;
 
@@ -52,6 +56,8 @@ class IPv6 : public IP {
 
 public:
     ~IPv6() override = default;
+
+    std::vector<unsigned> getIP() override;
 
     std::string getBinary() override;
 

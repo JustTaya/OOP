@@ -5,7 +5,6 @@
 #define CATCH_CONFIG_MAIN
 
 #include "catch.hpp"
-#include "IPParser.h"
 #include "IP.h"
 
 TEST_CASE("Parser", "[parser]") {
@@ -108,13 +107,29 @@ TEST_CASE("Factory", "[factory]") {
 TEST_CASE("IPv4", "[ipv4]") {
     auto ip = IPFactory::newIP("192.0.2.235");
     REQUIRE(ip->getBinary() == "11000000000000000000001011101011");
-    std::cout << ip << std::endl;
+    auto octets = ip->getIP();
+    REQUIRE(octets.size() == 4);
+    REQUIRE(octets[0] == 192);
+    REQUIRE(octets[1] == 0);
+    REQUIRE(octets[2] == 2);
+    REQUIRE(octets[3] == 235);
+
+    //std::cout << ip << std::endl;
 }
 
 TEST_CASE("IPv6", "[ipv6]") {
-    auto ip = IPFactory::newIP("2001:1f34:8a2e:07a0:765d::");
-    //auto ip = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
-    //REQUIRE(ip->getBinary() ==
-    //        "00100000000000010000110110111000000100011010001100001001110101110001111100110100100010100010111000000111101000000111011001011101");
-    std::cout << ip << std::endl;
+    auto ip = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+    REQUIRE(ip->getBinary() ==
+            "00100000000000010000110110111000000100011010001100001001110101110001111100110100100010100010111000000111101000000111011001011101");
+    //std::cout << ip << std::endl;
+    auto octets = ip->getIP();
+    REQUIRE(octets.size() == 8);
+    REQUIRE(octets[0] == 0x2001);
+    REQUIRE(octets[1] == 0x0db8);
+    REQUIRE(octets[2] == 0x11a3);
+    REQUIRE(octets[3] == 0x09d7);
+    REQUIRE(octets[4] == 0x1f34);
+    REQUIRE(octets[5] == 0x8a2e);
+    REQUIRE(octets[6] == 0x07a0);
+    REQUIRE(octets[7] == 0x765d);
 }
