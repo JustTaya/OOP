@@ -20,6 +20,37 @@ void IPv4::setBinary(const std::vector<unsigned> &_ip) {
     binary = newBinary;
 }
 
+void IPv4::print(std::ostringstream &oss) {
+    for (std::size_t i = 0; i < ip.size() - 1; ++i) {
+        oss << ip[i] << '.';
+    }
+    oss << ip.back();
+}
+
+std::size_t IPv6::findPos() {
+    std::size_t pos = 0;
+    int count = 0,
+            newCount = 0,
+            j = -1;
+    for (std::size_t i = 0; i < ip.size(); ++i) {
+        if (ip[i] == 0) {
+            ++newCount;
+            if (j == -1) {
+                j = i;
+            }
+        }
+        if (ip[i] != 0 || i == ip.size() - 1) {
+            if (newCount > count) {
+                count = newCount;
+                pos = j;
+            }
+            newCount = 0;
+            j = -1;
+        }
+    }
+    return pos;
+}
+
 IPv6::IPv6(std::vector<unsigned int> _ip) : ip(std::move(_ip)) {
     setBinary(ip);
 }
@@ -36,16 +67,19 @@ void IPv6::setBinary(const std::vector<unsigned> &_ip) {
     binary = newBinary;
 }
 
-std::unique_ptr<IP> IPFabric::newIP(const std::string &ip) {
-    static auto parser = IPParser();
-    std::vector<unsigned> parsed = parser.parse(ip);
-    if (parsed.empty())
-        return nullptr;
-    switch (parsed.size()) {
-        case 4:
-            return std::make_unique<IPv4>(IPv4(parsed));
-        case 8:
-            return std::make_unique<IPv6>(IPv6(parsed));
+void IPv6::print(std::ostringstream &oss) {
+    std::size_t pos = findPos();
+    for (std::size_t i = 0; i < ip.size(); ++i) {
+        if (i == pos && ip[i] == 0) {
+            while (ip[i] == 0)
+                ++i;
+            oss << "::";
+        } else {
+            oss << std::hex << ip[i];
+            if (i != ip.size() - 1 && pos != i + 1)
+                oss << ':';
+        }
     }
-    return nullptr;
 }
+
+
