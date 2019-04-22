@@ -9,7 +9,8 @@
 #include "IPConvertor.h"
 
 class IPComparator {
-    bool cmp(IP *ip1, IP *ip2); //return ip1<ip2
+public:
+    static bool cmp(IP *ip1, IP *ip2); //return ip1<ip2
 };
 
 

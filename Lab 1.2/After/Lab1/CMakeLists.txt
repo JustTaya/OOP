@@ -6,14 +6,11 @@ set(CMAKE_CXX_STANDARD 17)
 add_executable(Lab1 main.cpp
         test.cpp
         catch.hpp
-        IPAddress.cpp
-        IPAddress.h
-        IP.h
-        IPParser.cpp
-        IPParser.h
-        IPFactory.h
-        IPFactory.cpp
-        IPConvertor.h
-        IPConvertor.cpp
-        IPComparator.h
-        IPComparator.cpp)
+        IPAddress.h IPAddress.cpp
+        IP.h IP.cpp
+        IPParser.h IPParser.cpp
+        IPFactory.h IPFactory.cpp
+        IPConvertor.h IPConvertor.cpp
+        IPComparator.h IPComparator.cpp
+        SubNetwork.h SubNetwork.cpp
+        )

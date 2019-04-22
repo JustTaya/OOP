@@ -114,6 +114,9 @@ TEST_CASE("IPv4", "[ipv4]") {
     REQUIRE(octets[2] == 2);
     REQUIRE(octets[3] == 235);
 
+    std::ostringstream oss;
+    ip->print(oss);
+    REQUIRE(oss.str() == "192.0.2.235");
     //std::cout << ip << std::endl;
 }
 
@@ -121,7 +124,6 @@ TEST_CASE("IPv6", "[ipv6]") {
     auto ip = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
     REQUIRE(ip->getBinary() ==
             "00100000000000010000110110111000000100011010001100001001110101110001111100110100100010100010111000000111101000000111011001011101");
-    //std::cout << ip << std::endl;
     auto octets = ip->getIP();
     REQUIRE(octets.size() == 8);
     REQUIRE(octets[0] == 0x2001);
@@ -132,4 +134,41 @@ TEST_CASE("IPv6", "[ipv6]") {
     REQUIRE(octets[5] == 0x8a2e);
     REQUIRE(octets[6] == 0x07a0);
     REQUIRE(octets[7] == 0x765d);
+
+    std::ostringstream oss;
+    ip->print(oss);
+    REQUIRE(oss.str() == "2001:db8:11a3:9d7:1f34:8a2e:7a0:765d");
+    //std::cout << ip << std::endl;
+}
+
+TEST_CASE("IPConvertor", "[ipconvertor]") {
+    auto ip1 = IPFactory::newIP("192.168.99.1");
+    auto ip2 = IPtoIPv6::convert(ip1);
+    auto octets = ip2->getIP();
+    std::cout<<ip1<<std::endl;
+    std::cout<<ip2<<std::endl;
+    REQUIRE(octets.size() == 8);
+    REQUIRE(octets[0] == 0);
+    REQUIRE(octets[1] == 0);
+    REQUIRE(octets[2] == 0);
+    REQUIRE(octets[3] == 0);
+    REQUIRE(octets[4] == 0);
+    REQUIRE(octets[5] == 0xffff);
+    REQUIRE(octets[6] == 0xc0a8);
+    REQUIRE(octets[7] == 0x631);
+}
+
+
+TEST_CASE("IPComparator", "[ipcomparator]") {
+    SECTION("Compare ipv4 with same ipv4") {
+        auto ip1 = IPFactory::newIP("209.1.53.165");
+        auto ip2 = IPFactory::newIP("209.1.53.165");
+        REQUIRE(!IPComparator::cmp(ip1, ip2));
+    }
+    SECTION("Compare ipv4 with ipv4") {
+        auto ip1 = IPFactory::newIP("209.1.53.165");
+        auto ip2 = IPFactory::newIP("209.10.52.165");
+        REQUIRE(IPComparator::cmp(ip1, ip2));
+        REQUIRE(!IPComparator::cmp(ip2, ip1));
+    }
 }

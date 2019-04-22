@@ -8,7 +8,7 @@ IPv4::IPv4(std::vector<unsigned int> _ip) : ip(std::move(_ip)) {
     setBinary(ip);
 }
 
-std::string IPv4::getBinary() {
+std::string IPv4::getBinary() const {
     return binary;
 }
 
@@ -20,19 +20,18 @@ void IPv4::setBinary(const std::vector<unsigned> &_ip) {
     binary = newBinary;
 }
 
-void IPv4::print(std::ostringstream &oss) {
+void IPv4::print(std::ostringstream &oss) const {
     for (std::size_t i = 0; i < ip.size() - 1; ++i) {
-        oss << std::hex << ip[i];
-        oss << '.';
+        oss << ip[i] << '.';
     }
     oss << ip.back();
 }
 
-std::vector<unsigned> IPv4::getIP() {
+std::vector<unsigned> IPv4::getIP() const {
     return ip;
 }
 
-std::size_t IPv6::findPos() {
+std::size_t IPv6::findPos() const {
     std::size_t pos = 0;
     int count = 0,
             newCount = 0,
@@ -60,7 +59,7 @@ IPv6::IPv6(std::vector<unsigned int> _ip) : ip(std::move(_ip)) {
     setBinary(ip);
 }
 
-std::string IPv6::getBinary() {
+std::string IPv6::getBinary() const {
     return binary;
 }
 
@@ -72,7 +71,7 @@ void IPv6::setBinary(const std::vector<unsigned> &_ip) {
     binary = newBinary;
 }
 
-void IPv6::print(std::ostringstream &oss) {
+void IPv6::print(std::ostringstream &oss) const {
     std::size_t pos = findPos();
     for (std::size_t i = 0; i < ip.size(); ++i) {
         if (i == pos && ip[i] == 0) {
@@ -87,7 +86,7 @@ void IPv6::print(std::ostringstream &oss) {
     }
 }
 
-std::vector<unsigned> IPv6::getIP() {
+std::vector<unsigned> IPv6::getIP() const {
     return ip;
 }
 

@@ -18,11 +18,11 @@ class IP {
 public:
     virtual ~IP() = default;
 
-    virtual std::string getBinary() = 0;
+    virtual std::string getBinary() const = 0;
 
-    virtual std::vector<unsigned> getIP() = 0;
+    virtual std::vector<unsigned> getIP() const = 0;
 
-    virtual void print(std::ostringstream &oss) = 0;
+    virtual void print(std::ostringstream &oss) const = 0;
 
 protected:
     virtual void setBinary(const std::vector<unsigned> &_ip) = 0;
@@ -33,14 +33,14 @@ class IPv4 : public IP {
 
     explicit IPv4(std::vector<unsigned> _ip);
 
-    void print(std::ostringstream &oss) override;
-
 public:
     ~IPv4() override = default;
 
-    std::vector<unsigned> getIP() override;
+    std::vector<unsigned> getIP() const override;
 
-    std::string getBinary() override;
+    std::string getBinary() const override;
+
+    void print(std::ostringstream &oss) const override;
 
 private:
     std::vector<unsigned> ip;
@@ -57,11 +57,11 @@ class IPv6 : public IP {
 public:
     ~IPv6() override = default;
 
-    std::vector<unsigned> getIP() override;
+    std::vector<unsigned> getIP() const override;
 
-    std::string getBinary() override;
+    std::string getBinary() const override;
 
-    void print(std::ostringstream &oss) override;
+    void print(std::ostringstream &oss) const override;
 
 private:
     std::vector<unsigned> ip;
@@ -69,7 +69,7 @@ private:
 
     void setBinary(const std::vector<unsigned> &_ip) override;
 
-    std::size_t findPos();
+    std::size_t findPos() const;
 };
 
 #endif //LAB1_IPADDRESS_H

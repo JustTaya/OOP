@@ -9,12 +9,7 @@
 #include "IPConvertor.h"
 #include "IPComparator.h"
 
-std::ostream &operator<<(std::ostream &os, IP *ip) {
-    std::ostringstream oss;
-    ip->print(oss);
-    os << oss.str();
-    return os;
-}
+std::ostream &operator<<(std::ostream &os, IP *ip);
 
 
 #endif //LAB1_IP_H
