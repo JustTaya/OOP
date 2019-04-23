@@ -228,7 +228,7 @@ TEST_CASE("SubNetwork", "[SubNetwork]") {
         REQUIRE(octets[4] == 0x1f34);
         REQUIRE(octets[5] == 0x8a2e);
         REQUIRE(octets[6] == 0x07a0);
-        REQUIRE(octets[7] == 0x765d);;
+        REQUIRE(octets[7] == 0x765d);
         REQUIRE(octets == ipOctets);
         REQUIRE(subnet->getMask() == 127);
         REQUIRE(subnet->getBinary()=="00100000000000010000110110111000000100011010001100001001110101110001111100110100100010100010111000000111101000000111011001011100");

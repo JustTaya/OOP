@@ -15,7 +15,6 @@
 
 typedef bool (*Convertor)(std::istringstream &, unsigned &);
 
-
 class IPParser {
 public:
     IPParser();
