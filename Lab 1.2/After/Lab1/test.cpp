@@ -198,14 +198,42 @@ TEST_CASE("IPComparator", "[ipcomparator]") {
 }
 
 TEST_CASE("SubNetwork", "[SubNetwork]") {
-    auto ip = IPFactory::newIP("192.0.2.235");
-    auto subnet = SubNetworkFactory::newSubNetwork(ip, 31);
-    auto octets = subnet->getIP();
-    auto ipOctets=ip->getIP();
-    REQUIRE(octets.size() == 4);
-    REQUIRE(octets[0] == 192);
-    REQUIRE(octets[1] == 0);
-    REQUIRE(octets[2] == 2);
-    REQUIRE(octets[3] == 235);
-    REQUIRE(octets==ipOctets);
+    SECTION("ipv4") {
+        auto ip = IPFactory::newIP("192.0.2.235");
+        auto subnet = SubNetworkFactory::newSubNetwork(ip, 31);
+        auto octets = subnet->getIP();
+        auto ipOctets = ip->getIP();
+        REQUIRE(octets.size() == 4);
+        REQUIRE(octets[0] == 192);
+        REQUIRE(octets[1] == 0);
+        REQUIRE(octets[2] == 2);
+        REQUIRE(octets[3] == 235);
+        REQUIRE(octets == ipOctets);
+        REQUIRE(subnet->getMask() == 31);
+        REQUIRE(subnet->getBinary()=="11000000000000000000001011101010");
+        std::ostringstream oss;
+        subnet->print(oss);
+        REQUIRE(oss.str() == "192.0.2.235/31");
+    }
+    SECTION("ipv6") {
+        auto ip = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+        auto subnet = SubNetworkFactory::newSubNetwork(ip, 127);
+        auto octets = subnet->getIP();
+        auto ipOctets = ip->getIP();
+        REQUIRE(octets.size() == 8);
+        REQUIRE(octets[0] == 0x2001);
+        REQUIRE(octets[1] == 0x0db8);
+        REQUIRE(octets[2] == 0x11a3);
+        REQUIRE(octets[3] == 0x09d7);
+        REQUIRE(octets[4] == 0x1f34);
+        REQUIRE(octets[5] == 0x8a2e);
+        REQUIRE(octets[6] == 0x07a0);
+        REQUIRE(octets[7] == 0x765d);;
+        REQUIRE(octets == ipOctets);
+        REQUIRE(subnet->getMask() == 127);
+        REQUIRE(subnet->getBinary()=="00100000000000010000110110111000000100011010001100001001110101110001111100110100100010100010111000000111101000000111011001011100");
+        std::ostringstream oss;
+        subnet->print(oss);
+        REQUIRE(oss.str() == "2001:db8:11a3:9d7:1f34:8a2e:7a0:765d/127");
+    }
 }
