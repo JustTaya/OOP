@@ -34,3 +34,14 @@ bool SubNetworkComparator::cmp(const SubNetwork &subnet1, const SubNetwork &subn
     }
     return (subnet1.getMask() < subnet2.getMask());
 }
+
+SubNetwork *SubNetworkFactory::newSubNetwork(IP *ip, unsigned mask) {
+    if (auto ipv4 = dynamic_cast<IPv4 *>(ip)) {
+        if (mask <= maxIPv4Mask)
+            return new SubNetwork(ip, mask);
+    } else if (auto ipv6 = dynamic_cast<IPv6 *>(ip)) {
+        if (mask <= maxIPv6Mask)
+            return new SubNetwork(ip, mask);
+    }
+    return nullptr;
+}

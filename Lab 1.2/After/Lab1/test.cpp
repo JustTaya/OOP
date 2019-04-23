@@ -6,6 +6,7 @@
 
 #include "catch.hpp"
 #include "IP.h"
+#include "SubNetwork.h"
 
 TEST_CASE("Parser", "[parser]") {
     auto parser = IPParser();
@@ -145,8 +146,6 @@ TEST_CASE("IPConvertor", "[ipconvertor]") {
     auto ip1 = IPFactory::newIP("192.168.99.1");
     auto ip2 = IPtoIPv6::convert(ip1);
     auto octets = ip2->getIP();
-    std::cout<<ip1<<std::endl;
-    std::cout<<ip2<<std::endl;
     REQUIRE(octets.size() == 8);
     REQUIRE(octets[0] == 0);
     REQUIRE(octets[1] == 0);
@@ -164,6 +163,7 @@ TEST_CASE("IPComparator", "[ipcomparator]") {
         auto ip1 = IPFactory::newIP("209.1.53.165");
         auto ip2 = IPFactory::newIP("209.1.53.165");
         REQUIRE(!IPComparator::cmp(ip1, ip2));
+        REQUIRE(!IPComparator::cmp(ip2, ip1));
     }
     SECTION("Compare ipv4 with ipv4") {
         auto ip1 = IPFactory::newIP("209.1.53.165");
@@ -171,4 +171,41 @@ TEST_CASE("IPComparator", "[ipcomparator]") {
         REQUIRE(IPComparator::cmp(ip1, ip2));
         REQUIRE(!IPComparator::cmp(ip2, ip1));
     }
+    SECTION("Compare ipv6 with same ipv6") {
+        auto ip1 = IPFactory::newIP("2001:db8:11a3:9d7:1f34:8a2e:7a0:765d");
+        auto ip2 = IPFactory::newIP("2001:db8:11a3:9d7:1f34:8a2e:7a0:765d");
+        REQUIRE(!IPComparator::cmp(ip1, ip2));
+        REQUIRE(!IPComparator::cmp(ip2, ip1));
+    }
+    SECTION("Compare ipv6 with ipv6") {
+        auto ip1 = IPFactory::newIP("2001:db8:11a3:9d7:1f34:8a2e:7a0:765d");
+        auto ip2 = IPFactory::newIP("2001:db9:10a3:9d7:1f34:8a2e:7a0:765d");
+        REQUIRE(IPComparator::cmp(ip1, ip2));
+        REQUIRE(!IPComparator::cmp(ip2, ip1));
+    }
+    SECTION("Compare ipv4 with same ipv6") {
+        auto ip1 = IPFactory::newIP("192.168.99.1");
+        auto ip2 = IPFactory::newIP("::ffff:c0a8:631");
+        REQUIRE(!IPComparator::cmp(ip1, ip2));
+        REQUIRE(!IPComparator::cmp(ip2, ip1));
+    }
+    SECTION("Compare ipv4 with ipv6") {
+        auto ip1 = IPFactory::newIP("192.168.99.1");
+        auto ip2 = IPFactory::newIP("::ffff:c1a8:631");
+        REQUIRE(IPComparator::cmp(ip1, ip2));
+        REQUIRE(!IPComparator::cmp(ip2, ip1));
+    }
+}
+
+TEST_CASE("SubNetwork", "[SubNetwork]") {
+    auto ip = IPFactory::newIP("192.0.2.235");
+    auto subnet = SubNetworkFactory::newSubNetwork(ip, 31);
+    auto octets = subnet->getIP();
+    auto ipOctets=ip->getIP();
+    REQUIRE(octets.size() == 4);
+    REQUIRE(octets[0] == 192);
+    REQUIRE(octets[1] == 0);
+    REQUIRE(octets[2] == 2);
+    REQUIRE(octets[3] == 235);
+    REQUIRE(octets==ipOctets);
 }
