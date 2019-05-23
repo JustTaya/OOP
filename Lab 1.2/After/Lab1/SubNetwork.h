@@ -7,19 +7,36 @@
 
 #include "IP.h"
 
+
 class SubNetwork {
+public:
+    virtual ~SubNetwork() = default;
+
+    virtual std::vector<unsigned> getIP() const = 0;
+
+    virtual unsigned getMask() const = 0;
+
+    virtual std::string getBinary() const = 0;
+
+    virtual void print(std::ostringstream &oss) const = 0;
+
+    virtual bool check(IP *_ip) const = 0;
+};
+
+class IPv4SubNetwork : public SubNetwork {
 
 public:
+    ~IPv4SubNetwork() override;
 
-    std::vector<unsigned> getIP() const;
+    std::vector<unsigned> getIP() const override;
 
-    unsigned getMask() const;
+    unsigned getMask() const override;
 
-    std::string getBinary() const;
+    std::string getBinary() const override;
 
-    void print(std::ostringstream &oss) const;
+    void print(std::ostringstream &oss) const override;
 
-    bool check(IP *_ip) const;
+    bool check(IP *_ip) const override;
 
 private:
 
@@ -27,27 +44,39 @@ private:
 
     friend class SubNetworkFactory;
 
-    enum Version {
-        ipv4, ipv6, count
-    };
+    IP *ip;
+    unsigned mask;
+    static const unsigned maxMask = 32;
+
+    IPv4SubNetwork(IP *ip, unsigned mask) : ip(ip), mask(mask), v(v) {};
+};
+
+class IPv6SubNetwork : public SubNetwork {
+
+public:
+    ~IPv6SubNetwork() override;
+
+    std::vector<unsigned> getIP() const override;
+
+    unsigned getMask() const override;
+
+    std::string getBinary() const override;
+
+    void print(std::ostringstream &oss) const override;
+
+    bool check(IP *_ip) const override;
+
+private:
+
+    friend class SubNetworkComparator;
+
+    friend class SubNetworkFactory;
 
     IP *ip;
     unsigned mask;
-    Version v;
+    static const unsigned maxMask = 128;
 
-    typedef std::string (*Mask)(const std::string &binary, unsigned _mask);
-
-
-    static std::string getIPv4Binary(const std::string &binary, unsigned _mask);
-
-    static std::string getIPv6Binary(const std::string &binary, unsigned _mask);
-
-    std::string getBinaryMask(unsigned _mask, Version _v) const;
-
-    constexpr static const std::array<unsigned, count> maxMask = {32, 128};
-    constexpr const static std::array<Mask, count> applyMask = {&getIPv4Binary, &getIPv6Binary};
-
-    SubNetwork(IP *ip, unsigned mask, Version v) : ip(ip), mask(mask), v(v) {};
+    IPv6SubNetwork(IP *ip, unsigned mask) : ip(ip), mask(mask), v(v) {};
 };
 
 std::ostream &operator<<(std::ostream &os, const SubNetwork &subnet);
@@ -61,5 +90,7 @@ class SubNetworkFactory {
 public:
     static SubNetwork *newSubNetwork(IP *ip, unsigned mask);
 };
+
+
 
 #endif //LAB1_SUBNETWORK_H
