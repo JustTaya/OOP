@@ -10,7 +10,7 @@
 
 class SubNetwork {
 public:
-    virtual ~SubNetwork() = default;
+    virtual ~SubNetwork();
 
     virtual std::vector<unsigned> getIP() const = 0;
 
@@ -21,6 +21,16 @@ public:
     virtual void print(std::ostringstream &oss) const = 0;
 
     virtual bool check(IP *_ip) const = 0;
+
+protected:
+    IP *ip;
+    unsigned mask;
+
+    SubNetwork(IP *ip, unsigned mask) : ip(ip), mask(mask) {};
+
+    friend class SubNetworkComparator;
+
+    friend class SubNetworkFactory;
 };
 
 class IPv4SubNetwork : public SubNetwork {
@@ -44,11 +54,9 @@ private:
 
     friend class SubNetworkFactory;
 
-    IP *ip;
-    unsigned mask;
     static const unsigned maxMask = 32;
 
-    IPv4SubNetwork(IP *ip, unsigned mask) : ip(ip), mask(mask), v(v) {};
+    IPv4SubNetwork(IP *ip, unsigned mask) : SubNetwork(ip, mask) {};
 };
 
 class IPv6SubNetwork : public SubNetwork {
@@ -72,11 +80,9 @@ private:
 
     friend class SubNetworkFactory;
 
-    IP *ip;
-    unsigned mask;
     static const unsigned maxMask = 128;
 
-    IPv6SubNetwork(IP *ip, unsigned mask) : ip(ip), mask(mask), v(v) {};
+    IPv6SubNetwork(IP *ip, unsigned mask) : SubNetwork(ip, mask) {};
 };
 
 std::ostream &operator<<(std::ostream &os, const SubNetwork &subnet);
