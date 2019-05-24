@@ -7,7 +7,6 @@
 
 #include "IP.h"
 
-
 class SubNetwork {
 public:
     virtual ~SubNetwork();
@@ -25,6 +24,8 @@ public:
 protected:
     IP *ip;
     unsigned mask;
+    static const unsigned ipv4MaxMask = 32;
+    static const unsigned ipv6MaxMask = 128;
 
     SubNetwork(IP *ip, unsigned mask) : ip(ip), mask(mask) {};
 
@@ -54,7 +55,7 @@ private:
 
     friend class SubNetworkFactory;
 
-    static const unsigned maxMask = 32;
+    static const unsigned maxMask = SubNetwork::ipv4MaxMask;
 
     IPv4SubNetwork(IP *ip, unsigned mask) : SubNetwork(ip, mask) {};
 };
@@ -80,7 +81,7 @@ private:
 
     friend class SubNetworkFactory;
 
-    static const unsigned maxMask = 128;
+    static const unsigned maxMask = SubNetwork::ipv6MaxMask;
 
     IPv6SubNetwork(IP *ip, unsigned mask) : SubNetwork(ip, mask) {};
 };
@@ -96,7 +97,6 @@ class SubNetworkFactory {
 public:
     static SubNetwork *newSubNetwork(IP *ip, unsigned mask);
 };
-
 
 
 #endif //LAB1_SUBNETWORK_H

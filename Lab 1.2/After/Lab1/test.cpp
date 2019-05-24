@@ -157,7 +157,6 @@ TEST_CASE("IPConvertor", "[ipconvertor]") {
     REQUIRE(octets[7] == 0x631);
 }
 
-
 TEST_CASE("IPComparator", "[ipcomparator]") {
     SECTION("Compare ipv4 with same ipv4") {
         auto ip1 = IPFactory::newIP("209.1.53.165");
@@ -200,6 +199,8 @@ TEST_CASE("IPComparator", "[ipcomparator]") {
 TEST_CASE("SubNetwork", "[SubNetwork]") {
     SECTION("ipv4") {
         auto ip = IPFactory::newIP("192.0.2.235");
+        auto checkIP1=IPFactory::newIP("192.0.2.234");
+        auto checkIP2=IPFactory::newIP("192.100.2.235");
         auto subnet = SubNetworkFactory::newSubNetwork(ip, 31);
         auto octets = subnet->getIP();
         auto ipOctets = ip->getIP();
@@ -211,6 +212,9 @@ TEST_CASE("SubNetwork", "[SubNetwork]") {
         REQUIRE(octets == ipOctets);
         REQUIRE(subnet->getMask() == 31);
         REQUIRE(subnet->getBinary()=="11000000000000000000001011101010");
+        REQUIRE(subnet->check(ip));
+        REQUIRE(subnet->check(checkIP1));
+        REQUIRE(subnet->check(checkIP2));
         std::ostringstream oss;
         subnet->print(oss);
         REQUIRE(oss.str() == "192.0.2.235/31");

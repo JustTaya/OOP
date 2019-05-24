@@ -36,6 +36,7 @@ void IPv4SubNetwork::print(std::ostringstream &oss) const {
 }
 
 bool IPv4SubNetwork::check(IP *_ip) const {
+
     return false;
 }
 
@@ -67,7 +68,10 @@ void IPv6SubNetwork::print(std::ostringstream &oss) const {
 }
 
 bool IPv6SubNetwork::check(IP *_ip) const {
+    IP *tmp = IPtoIPv6::convert(_ip);
+    for (int i = mask - 1; i >= maxMask - mask; i--){
 
+    }
 }
 
 bool SubNetworkComparator::cmp(const SubNetwork &subnet1, const SubNetwork &subnet2) {
