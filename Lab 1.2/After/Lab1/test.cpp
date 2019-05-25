@@ -433,7 +433,7 @@ TEST_CASE("BinNode", "[BinNode]") {
         auto node = new BinaryNode<int>(10, nullptr);
         REQUIRE(node->getKey() == 10);
         REQUIRE(node->getParent() == nullptr);
-        REQUIRE(node->getChildren().size()==2);
+        REQUIRE(node->getChildren().size() == 2);
         REQUIRE(node->getLeft() == nullptr);
         REQUIRE(node->getRight() == nullptr);
     }
@@ -443,7 +443,7 @@ TEST_CASE("BinNode", "[BinNode]") {
             auto node = new BinaryNode<IP *>(ip, nullptr);
             REQUIRE(node->getKey() == ip);
             REQUIRE(node->getParent() == nullptr);
-            REQUIRE(node->getChildren().size()==2);
+            REQUIRE(node->getChildren().size() == 2);
             REQUIRE(node->getLeft() == nullptr);
             REQUIRE(node->getRight() == nullptr);
         }
@@ -452,7 +452,7 @@ TEST_CASE("BinNode", "[BinNode]") {
             auto node = new BinaryNode<IP *>(ip, nullptr);
             REQUIRE(node->getKey() == ip);
             REQUIRE(node->getParent() == nullptr);
-            REQUIRE(node->getChildren().size()==2);
+            REQUIRE(node->getChildren().size() == 2);
             REQUIRE(node->getLeft() == nullptr);
             REQUIRE(node->getRight() == nullptr);
         }
@@ -464,7 +464,7 @@ TEST_CASE("BinNode", "[BinNode]") {
             auto node = new BinaryNode<SubNetwork *>(subnet, nullptr);
             REQUIRE(node->getKey() == subnet);
             REQUIRE(node->getParent() == nullptr);
-            REQUIRE(node->getChildren().size()==2);
+            REQUIRE(node->getChildren().size() == 2);
             REQUIRE(node->getLeft() == nullptr);
             REQUIRE(node->getRight() == nullptr);
         }
@@ -474,13 +474,108 @@ TEST_CASE("BinNode", "[BinNode]") {
             auto node = new BinaryNode<SubNetwork *>(subnet, nullptr);
             REQUIRE(node->getKey() == subnet);
             REQUIRE(node->getParent() == nullptr);
-            REQUIRE(node->getChildren().size()==2);
+            REQUIRE(node->getChildren().size() == 2);
             REQUIRE(node->getLeft() == nullptr);
             REQUIRE(node->getRight() == nullptr);
         }
     }
 }
 
+TEST_CASE("MultiTree", "[MultiTree]") {
+    SECTION("int") {
 
+        SECTION("Empty tree") {
+            auto tree = new MultiTree<int, std::less<>>();
+            REQUIRE(tree->getRoot() == nullptr);
+            REQUIRE(tree->search(10) == nullptr);
+        }
+        SECTION("Tree with root") {
+            int tmp = 10,
+                    tmp1 = 3,
+                    tmp2 = 5;
 
+            auto tree = new MultiTree<int, std::less<>>(tmp);
 
+            SECTION("root") {
+                REQUIRE(tree->search(tmp)->getKey() == tmp);
+                REQUIRE(tree->getRoot()->getKey() == tmp);
+                REQUIRE(tree->getRoot() == tree->search(tmp));
+            }
+        }
+    }
+    SECTION("ip") {
+
+    }
+
+    SECTION("subnet") {
+
+    }
+}
+
+TEST_CASE("BinaryTree", "[BinaryTree]") {
+    SECTION("int") {
+
+        SECTION("Empty tree") {
+            auto tree = new MultiTree<int, std::less<>>();
+            REQUIRE(tree->getRoot() == nullptr);
+            REQUIRE(tree->search(10) == nullptr);
+        }
+        SECTION("Tree with root") {
+            int tmp = 10,
+                    tmp1 = 3,
+                    tmp2 = 5;
+
+            auto tree = new MultiTree<int, std::less<>>(tmp);
+
+            SECTION("root") {
+                REQUIRE(tree->search(tmp)->getKey() == tmp);
+                REQUIRE(tree->getRoot()->getKey() == tmp);
+                REQUIRE(tree->getRoot() == tree->search(tmp));
+            }
+        }
+        SECTION("insert"){
+
+        }
+        SECTION("delete"){
+
+        }
+    }
+    SECTION("ip") {
+
+    }
+
+    SECTION("subnet") {
+
+    }
+}
+
+TEST_CASE("BSTree", "[BSTree]") {
+    SECTION("int") {
+
+        SECTION("Empty tree") {
+            auto tree = new MultiTree<int, std::less<>>();
+            REQUIRE(tree->getRoot() == nullptr);
+            REQUIRE(tree->search(10) == nullptr);
+        }
+        SECTION("Tree with root") {
+            int tmp = 10,
+                    tmp1 = 3,
+                    tmp2 = 5;
+
+            auto tree = new MultiTree<int, std::less<>>(tmp);
+
+            SECTION("root") {
+                REQUIRE(tree->search(tmp)->getKey() == tmp);
+                REQUIRE(tree->getRoot()->getKey() == tmp);
+                REQUIRE(tree->getRoot() == tree->search(tmp));
+            }
+        }
+    }
+    SECTION("ip") {
+
+    }
+
+    SECTION("subnet") {
+
+    }
+}

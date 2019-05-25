@@ -10,7 +10,7 @@
 template<typename Key>
 class AbstractNode {
 public:
-    AbstractNode(const Key &key, AbstractNode<Key> *parent) : keys(std::vector<Key>(1, key)), parent(parent) {};
+    AbstractNode(const Key &key, AbstractNode<Key> *parent=nullptr) : keys(std::vector<Key>(1, key)), parent(parent) {};
 
     virtual ~AbstractNode() = default;
 
@@ -61,7 +61,7 @@ void AbstractNode<Key>::setParent(AbstractNode<Key> *node) {
 template<typename Key>
 class MultiNode : public AbstractNode<Key> {
 public:
-    MultiNode(const Key &key, AbstractNode<Key> *parent) : AbstractNode<Key>(key, parent) {};
+    MultiNode(const Key &key, AbstractNode<Key> *parent=nullptr) : AbstractNode<Key>(key, parent) {};
 
     ~MultiNode() override = default;
 
@@ -76,7 +76,7 @@ Key MultiNode<Key>::getKey() const {
 template<typename Key>
 class BinaryNode : public AbstractNode<Key> {
 public:
-    BinaryNode(Key key, BinaryNode<Key> *parent) : AbstractNode<Key>(key, parent) {
+    BinaryNode(Key key, BinaryNode<Key> *parent=nullptr) : AbstractNode<Key>(key, parent) {
         AbstractNode<Key>::children.resize(2, nullptr);
     };
 
