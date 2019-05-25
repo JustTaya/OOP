@@ -9,18 +9,20 @@
 class Tree {
 public:
     virtual ~Tree() = default;
-    bool insert();
 };
 
-class MultiTree {
+class MultiTree : public Tree {
+public:
+    ~MultiTree() override = default;
+};
+
+class BinTree : public Tree{
+    ~MultiTree() override = default;
 
 };
 
-class BinTree {
-
-};
-
-class BSTree {
+class BSTree: public BinTree {
+    ~MultiTree() override = default;
 
 };
 

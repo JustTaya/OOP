@@ -7,6 +7,9 @@
 #include "catch.hpp"
 #include "IP.h"
 #include "SubNetwork.h"
+#include "T
+
+//IP tests
 
 TEST_CASE("Parser", "[parser]") {
     auto parser = IPParser();
@@ -196,6 +199,8 @@ TEST_CASE("IPComparator", "[ipcomparator]") {
     }
 }
 
+//Subnetwork tests
+
 TEST_CASE("SubNetwork", "[SubNetwork]") {
     SECTION("ipv4") {
         auto ip = IPFactory::newIP("192.0.2.235");
@@ -377,6 +382,10 @@ TEST_CASE("SubNetworkComparator", "[SubNetworkComparator]") {
         }
     }
 }
+
+//Tree tests
+
+
 
 
 
