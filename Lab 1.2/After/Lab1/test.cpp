@@ -199,8 +199,9 @@ TEST_CASE("IPComparator", "[ipcomparator]") {
 TEST_CASE("SubNetwork", "[SubNetwork]") {
     SECTION("ipv4") {
         auto ip = IPFactory::newIP("192.0.2.235");
-        auto checkIP1=IPFactory::newIP("192.0.2.234");
-        auto checkIP2=IPFactory::newIP("192.100.2.235");
+        auto checkIP1 = IPFactory::newIP("192.0.2.234");
+        auto checkIP2 = IPFactory::newIP("192.0.2.238");
+        auto checkIP3 = IPFactory::newIP("2000:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
         auto subnet = SubNetworkFactory::newSubNetwork(ip, 31);
         auto octets = subnet->getIP();
         auto ipOctets = ip->getIP();
@@ -211,16 +212,19 @@ TEST_CASE("SubNetwork", "[SubNetwork]") {
         REQUIRE(octets[3] == 235);
         REQUIRE(octets == ipOctets);
         REQUIRE(subnet->getMask() == 31);
-        REQUIRE(subnet->getBinary()=="11000000000000000000001011101010");
+        REQUIRE(subnet->getBinary() == "11000000000000000000001011101010");
         REQUIRE(subnet->check(ip));
         REQUIRE(subnet->check(checkIP1));
-        REQUIRE(subnet->check(checkIP2));
+        REQUIRE(!subnet->check(checkIP2));
+        REQUIRE(!subnet->check(checkIP3));
         std::ostringstream oss;
         subnet->print(oss);
         REQUIRE(oss.str() == "192.0.2.235/31");
     }
     SECTION("ipv6") {
         auto ip = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+        auto checkIP1 = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+        auto checkIP2 = IPFactory::newIP("2000:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
         auto subnet = SubNetworkFactory::newSubNetwork(ip, 127);
         auto octets = subnet->getIP();
         auto ipOctets = ip->getIP();
@@ -235,9 +239,145 @@ TEST_CASE("SubNetwork", "[SubNetwork]") {
         REQUIRE(octets[7] == 0x765d);
         REQUIRE(octets == ipOctets);
         REQUIRE(subnet->getMask() == 127);
-        REQUIRE(subnet->getBinary()=="00100000000000010000110110111000000100011010001100001001110101110001111100110100100010100010111000000111101000000111011001011100");
+        REQUIRE(subnet->getBinary() ==
+                "00100000000000010000110110111000000100011010001100001001110101110001111100110100100010100010111000000111101000000111011001011100");
+        REQUIRE(subnet->check(checkIP1));
+        REQUIRE(!subnet->check(checkIP2));
         std::ostringstream oss;
         subnet->print(oss);
         REQUIRE(oss.str() == "2001:db8:11a3:9d7:1f34:8a2e:7a0:765d/127");
     }
 }
+
+TEST_CASE("SubNetworkComparator", "[SubNetworkComparator]") {
+    SECTION("ipv4 subnetwork comparison") {
+        SECTION("equal ip & mask") {
+            auto ip1 = IPFactory::newIP("192.0.2.235");
+            auto ip2 = IPFactory::newIP("192.0.2.235");
+
+            auto subnet1 = SubNetworkFactory::newSubNetwork(ip1, 31);
+            auto subnet2 = SubNetworkFactory::newSubNetwork(ip2, 31);
+
+            REQUIRE(!SubNetworkComparator::cmp(subnet1, subnet2));
+            REQUIRE(!SubNetworkComparator::cmp(subnet2, subnet1));
+        }
+        SECTION("equal ip") {
+            auto ip1 = IPFactory::newIP("192.0.2.235");
+            auto ip2 = IPFactory::newIP("192.0.2.235");
+
+            auto subnet1 = SubNetworkFactory::newSubNetwork(ip1, 31);
+            auto subnet2 = SubNetworkFactory::newSubNetwork(ip2, 28);
+
+            REQUIRE(!SubNetworkComparator::cmp(subnet1, subnet2));
+            REQUIRE(SubNetworkComparator::cmp(subnet2, subnet1));
+        }
+        SECTION("equal mask") {
+            auto ip1 = IPFactory::newIP("192.0.2.235");
+            auto ip2 = IPFactory::newIP("190.0.2.235");
+
+            auto subnet1 = SubNetworkFactory::newSubNetwork(ip1, 31);
+            auto subnet2 = SubNetworkFactory::newSubNetwork(ip2, 31);
+
+            REQUIRE(!SubNetworkComparator::cmp(subnet1, subnet2));
+            REQUIRE(SubNetworkComparator::cmp(subnet2, subnet1));
+        }
+        SECTION("different") {
+            auto ip1 = IPFactory::newIP("192.0.2.235");
+            auto ip2 = IPFactory::newIP("190.0.2.235");
+
+            auto subnet1 = SubNetworkFactory::newSubNetwork(ip1, 31);
+            auto subnet2 = SubNetworkFactory::newSubNetwork(ip2, 28);
+
+            REQUIRE(!SubNetworkComparator::cmp(subnet1, subnet2));
+            REQUIRE(SubNetworkComparator::cmp(subnet2, subnet1));
+        }
+    }
+    SECTION("ipv6 subnetwork comparison") {
+        SECTION("equal ip & mask") {
+            auto ip1 = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+            auto ip2 = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+
+            auto subnet1 = SubNetworkFactory::newSubNetwork(ip1, 127);
+            auto subnet2 = SubNetworkFactory::newSubNetwork(ip2, 127);
+
+            REQUIRE(!SubNetworkComparator::cmp(subnet1, subnet2));
+            REQUIRE(!SubNetworkComparator::cmp(subnet2, subnet1));
+        }
+        SECTION("equal ip") {
+            auto ip1 = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+            auto ip2 = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+
+            auto subnet1 = SubNetworkFactory::newSubNetwork(ip1, 127);
+            auto subnet2 = SubNetworkFactory::newSubNetwork(ip2, 120);
+
+            REQUIRE(!SubNetworkComparator::cmp(subnet1, subnet2));
+            REQUIRE(SubNetworkComparator::cmp(subnet2, subnet1));
+        }
+        SECTION("equal mask") {
+            auto ip1 = IPFactory::newIP("2001:0db8:ffff:09d7:1f34:8a2e:07a0:765d");
+            auto ip2 = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+
+            auto subnet1 = SubNetworkFactory::newSubNetwork(ip1, 127);
+            auto subnet2 = SubNetworkFactory::newSubNetwork(ip2, 127);
+
+            REQUIRE(!SubNetworkComparator::cmp(subnet1, subnet2));
+            REQUIRE(SubNetworkComparator::cmp(subnet2, subnet1));
+        }
+        SECTION("different") {
+            auto ip1 = IPFactory::newIP("2001:0db8:ffff:09d7:1f34:8a2e:07a0:765d");
+            auto ip2 = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+
+            auto subnet1 = SubNetworkFactory::newSubNetwork(ip1, 127);
+            auto subnet2 = SubNetworkFactory::newSubNetwork(ip2, 120);
+
+            REQUIRE(!SubNetworkComparator::cmp(subnet1, subnet2));
+            REQUIRE(SubNetworkComparator::cmp(subnet2, subnet1));
+        }
+    }
+    SECTION("ipv4 & ipv6 subnetwork comparison") {
+        SECTION("equal ip & mask") {
+            auto ip1 = IPFactory::newIP("192.168.99.1");
+            auto ip2 = IPFactory::newIP("::ffff:c0a8:631");
+
+            auto subnet1 = SubNetworkFactory::newSubNetwork(ip1, 31);
+            auto subnet2 = SubNetworkFactory::newSubNetwork(ip2, 31);
+
+            REQUIRE(!SubNetworkComparator::cmp(subnet1, subnet2));
+            REQUIRE(!SubNetworkComparator::cmp(subnet2, subnet1));
+        }
+        SECTION("equal ip") {
+            auto ip1 = IPFactory::newIP("192.168.99.1");
+            auto ip2 = IPFactory::newIP("::ffff:c0a8:631");
+
+            auto subnet1 = SubNetworkFactory::newSubNetwork(ip1, 31);
+            auto subnet2 = SubNetworkFactory::newSubNetwork(ip2, 20);
+
+            REQUIRE(!SubNetworkComparator::cmp(subnet1, subnet2));
+            REQUIRE(SubNetworkComparator::cmp(subnet2, subnet1));
+        }
+        SECTION("equal mask") {
+            auto ip1 = IPFactory::newIP("192.168.99.1");
+            auto ip2 = IPFactory::newIP("::ffff:c1a8:631");
+
+            auto subnet1 = SubNetworkFactory::newSubNetwork(ip1, 31);
+            auto subnet2 = SubNetworkFactory::newSubNetwork(ip2, 31);
+
+            REQUIRE(SubNetworkComparator::cmp(subnet1, subnet2));
+            REQUIRE(!SubNetworkComparator::cmp(subnet2, subnet1));
+        }
+        SECTION("different") {
+            auto ip1 = IPFactory::newIP("192.168.99.1");
+            auto ip2 = IPFactory::newIP("::ffff:c1a8:631");
+
+            auto subnet1 = SubNetworkFactory::newSubNetwork(ip1, 31);
+            auto subnet2 = SubNetworkFactory::newSubNetwork(ip2, 20);
+
+            REQUIRE(!SubNetworkComparator::cmp(subnet1, subnet2));
+            REQUIRE(SubNetworkComparator::cmp(subnet2, subnet1));
+        }
+    }
+}
+
+
+
+

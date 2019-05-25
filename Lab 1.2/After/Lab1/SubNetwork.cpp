@@ -36,8 +36,15 @@ void IPv4SubNetwork::print(std::ostringstream &oss) const {
 }
 
 bool IPv4SubNetwork::check(IP *_ip) const {
-
-    return false;
+    if (auto ipv6 = dynamic_cast<IPv6 *>(_ip)) {
+        return false;
+    }
+    std::bitset<maxMask> ipBinary(_ip->getBinary());
+    std::bitset<maxMask> subnetBinary(ip->getBinary());
+    std::bitset<maxMask> IPv4mask;
+    for (int i = maxMask - 1; i >= maxMask - mask; i--)
+        IPv4mask[i] = true;
+    return ((ipBinary & IPv4mask) == (subnetBinary & IPv4mask));
 }
 
 IPv6SubNetwork::~IPv6SubNetwork() {
@@ -53,11 +60,11 @@ unsigned IPv6SubNetwork::getMask() const {
 }
 
 std::string IPv6SubNetwork::getBinary() const {
-    std::bitset<maxMask> IPv4mask;
+    std::bitset<maxMask> IPv6mask;
     std::bitset<maxMask> result;
     for (int i = maxMask - 1; i >= maxMask - mask; i--)
-        IPv4mask[i] = true;
-    result = (std::bitset<maxMask>(ip->getBinary()) & IPv4mask);
+        IPv6mask[i] = true;
+    result = (std::bitset<maxMask>(ip->getBinary()) & IPv6mask);
     return result.to_string();
 }
 
@@ -68,17 +75,20 @@ void IPv6SubNetwork::print(std::ostringstream &oss) const {
 }
 
 bool IPv6SubNetwork::check(IP *_ip) const {
-    IP *tmp = IPtoIPv6::convert(_ip);
-    for (int i = mask - 1; i >= maxMask - mask; i--){
-
-    }
+    auto tmp = IPtoIPv6::convert(_ip)->getBinary();
+    std::bitset<maxMask> ipBinary(tmp);
+    std::bitset<maxMask> subnetBinary(ip->getBinary());
+    std::bitset<maxMask> IPv6mask;
+    for (int i = maxMask - 1; i >= maxMask - mask; i--)
+        IPv6mask[i] = true;
+    return ((ipBinary & IPv6mask) == (subnetBinary & IPv6mask));
 }
 
-bool SubNetworkComparator::cmp(const SubNetwork &subnet1, const SubNetwork &subnet2) {
-    if (subnet1.getMask() == subnet2.getMask()) {
-        return IPComparator::cmp(subnet1.ip, subnet2.ip);
+bool SubNetworkComparator::cmp(const SubNetwork *subnet1, const SubNetwork *subnet2) {
+    if (subnet1->getMask() == subnet2->getMask()) {
+        return IPComparator::cmp(subnet1->ip, subnet2->ip);
     }
-    return (subnet1.getMask() < subnet2.getMask());
+    return (subnet1->getMask() < subnet2->getMask());
 }
 
 SubNetwork *SubNetworkFactory::newSubNetwork(IP *ip, unsigned mask) {

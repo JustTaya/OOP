@@ -90,13 +90,12 @@ std::ostream &operator<<(std::ostream &os, const SubNetwork &subnet);
 
 class SubNetworkComparator {
 public:
-    static bool cmp(const SubNetwork &subnet1, const SubNetwork &subnet2); //return subnet1<subnet2
+    static bool cmp(const SubNetwork *subnet1, const SubNetwork *subnet2); //return subnet1<subnet2
 };
 
 class SubNetworkFactory {
 public:
     static SubNetwork *newSubNetwork(IP *ip, unsigned mask);
 };
-
 
 #endif //LAB1_SUBNETWORK_H
