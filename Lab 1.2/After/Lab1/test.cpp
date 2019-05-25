@@ -7,7 +7,7 @@
 #include "catch.hpp"
 #include "IP.h"
 #include "SubNetwork.h"
-#include "T
+#include "Tree.h"
 
 //IP tests
 
@@ -385,7 +385,101 @@ TEST_CASE("SubNetworkComparator", "[SubNetworkComparator]") {
 
 //Tree tests
 
+TEST_CASE("MultiNode", "[MultiNode]") {
+    SECTION("int") {
+        auto node = new MultiNode<int>(10, nullptr);
+        REQUIRE(node->getKey() == 10);
+        REQUIRE(node->getParent() == nullptr);
+        REQUIRE(node->getChildren().empty());
+    }
+    SECTION("ip") {
+        SECTION("ipv4") {
+            auto ip = IPFactory::newIP("192.0.2.235");
+            auto node = new MultiNode<IP *>(ip, nullptr);
+            REQUIRE(node->getKey() == ip);
+            REQUIRE(node->getParent() == nullptr);
+            REQUIRE(node->getChildren().empty());
+        }
+        SECTION("ipv6") {
+            auto ip = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+            auto node = new MultiNode<IP *>(ip, nullptr);
+            REQUIRE(node->getKey() == ip);
+            REQUIRE(node->getParent() == nullptr);
+            REQUIRE(node->getChildren().empty());
+        }
+    }
+    SECTION("subnet") {
+        SECTION("ipv4") {
+            auto ip = IPFactory::newIP("192.0.2.235");
+            auto subnet = SubNetworkFactory::newSubNetwork(ip, 31);
+            auto node = new MultiNode<SubNetwork *>(subnet, nullptr);
+            REQUIRE(node->getKey() == subnet);
+            REQUIRE(node->getParent() == nullptr);
+            REQUIRE(node->getChildren().empty());
+        }
+        SECTION("ipv6") {
+            auto ip = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+            auto subnet = SubNetworkFactory::newSubNetwork(ip, 127);
+            auto node = new MultiNode<SubNetwork *>(subnet, nullptr);
+            REQUIRE(node->getKey() == subnet);
+            REQUIRE(node->getParent() == nullptr);
+            REQUIRE(node->getChildren().empty());
+        }
+    }
+}
 
+TEST_CASE("BinNode", "[BinNode]") {
+    SECTION("int") {
+        auto node = new BinaryNode<int>(10, nullptr);
+        REQUIRE(node->getKey() == 10);
+        REQUIRE(node->getParent() == nullptr);
+        REQUIRE(node->getChildren().size()==2);
+        REQUIRE(node->getLeft() == nullptr);
+        REQUIRE(node->getRight() == nullptr);
+    }
+    SECTION("ip") {
+        SECTION("ipv4") {
+            auto ip = IPFactory::newIP("192.0.2.235");
+            auto node = new BinaryNode<IP *>(ip, nullptr);
+            REQUIRE(node->getKey() == ip);
+            REQUIRE(node->getParent() == nullptr);
+            REQUIRE(node->getChildren().size()==2);
+            REQUIRE(node->getLeft() == nullptr);
+            REQUIRE(node->getRight() == nullptr);
+        }
+        SECTION("ipv6") {
+            auto ip = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+            auto node = new BinaryNode<IP *>(ip, nullptr);
+            REQUIRE(node->getKey() == ip);
+            REQUIRE(node->getParent() == nullptr);
+            REQUIRE(node->getChildren().size()==2);
+            REQUIRE(node->getLeft() == nullptr);
+            REQUIRE(node->getRight() == nullptr);
+        }
+    }
+    SECTION("subnet") {
+        SECTION("ipv4") {
+            auto ip = IPFactory::newIP("192.0.2.235");
+            auto subnet = SubNetworkFactory::newSubNetwork(ip, 31);
+            auto node = new BinaryNode<SubNetwork *>(subnet, nullptr);
+            REQUIRE(node->getKey() == subnet);
+            REQUIRE(node->getParent() == nullptr);
+            REQUIRE(node->getChildren().size()==2);
+            REQUIRE(node->getLeft() == nullptr);
+            REQUIRE(node->getRight() == nullptr);
+        }
+        SECTION("ipv6") {
+            auto ip = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+            auto subnet = SubNetworkFactory::newSubNetwork(ip, 127);
+            auto node = new BinaryNode<SubNetwork *>(subnet, nullptr);
+            REQUIRE(node->getKey() == subnet);
+            REQUIRE(node->getParent() == nullptr);
+            REQUIRE(node->getChildren().size()==2);
+            REQUIRE(node->getLeft() == nullptr);
+            REQUIRE(node->getRight() == nullptr);
+        }
+    }
+}
 
 
 

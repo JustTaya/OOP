@@ -5,6 +5,7 @@
 #ifndef LAB1_TREE_H
 #define LAB1_TREE_H
 
+#include "TreeNode.h"
 
 class Tree {
 public:
@@ -16,13 +17,15 @@ public:
     ~MultiTree() override = default;
 };
 
-class BinTree : public Tree{
-    ~MultiTree() override = default;
+class BinTree : public Tree {
+public:
+    ~BinTree() override = default;
 
 };
 
-class BSTree: public BinTree {
-    ~MultiTree() override = default;
+class BSTree : public BinTree {
+public:
+    ~BSTree() override = default;
 
 };
 
