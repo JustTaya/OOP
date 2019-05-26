@@ -4,7 +4,7 @@
 
 #include "IPComparator.h"
 
-bool IPComparator::cmp(IP *ip1, IP *ip2) {
+bool IPComparator::operator()(IP *ip1, IP *ip2) {
     if (ip1 == nullptr || ip2 == nullptr)
         return false;
     auto octets1 = IPtoIPv6::convert(ip1)->getIP();

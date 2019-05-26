@@ -84,7 +84,7 @@ bool IPv6SubNetwork::check(IP *_ip) const {
     return ((ipBinary & IPv6mask) == (subnetBinary & IPv6mask));
 }
 
-bool SubNetworkComparator::cmp(const SubNetwork *subnet1, const SubNetwork *subnet2) {
+bool SubNetworkComparator::operator()(const SubNetwork *subnet1, const SubNetwork *subnet2){
     if (subnet1->getMask() == subnet2->getMask()) {
         return IPComparator::cmp(subnet1->ip, subnet2->ip);
     }
