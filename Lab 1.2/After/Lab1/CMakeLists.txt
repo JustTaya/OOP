@@ -14,6 +14,5 @@ add_executable(Lab1 main.cpp
         IPComparator.h IPComparator.cpp
         SubNetwork.h SubNetwork.cpp
         Tree.h
-        TreeNode.h
         TreeIterator.h
         )
