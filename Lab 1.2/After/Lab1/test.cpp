@@ -505,6 +505,24 @@ TEST_CASE("MultiTree", "[MultiTree]") {
                 tree->insert(7, pathVector, 1);
                 REQUIRE(tree->search(7) != nullptr);
             }
+
+            SECTION("Deletion") {
+                tree->insert(3);
+                tree->insert(5);
+                std::string path = "0";
+                tree->insert(10, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(7, pathVector, 1);
+
+                tree->deleteNode(7);
+                REQUIRE(tree->search(7) == nullptr);
+                tree->deleteNode(10);
+                REQUIRE(tree->search(10) == nullptr);
+                tree->deleteNode(5);
+                REQUIRE(tree->search(5) == nullptr);
+                tree->deleteNode(3);
+                REQUIRE(tree->search(3) == nullptr);
+            }
         }
         SECTION("Tree with root") {
             auto tree = new MultiTree<int, std::less<>>(3);
@@ -521,10 +539,98 @@ TEST_CASE("MultiTree", "[MultiTree]") {
                 tree->insert(7, pathVector, 1);
                 REQUIRE(tree->search(7) != nullptr);
             }
+
+            SECTION("Deletion") {
+                tree->insert(5);
+                std::string path = "0";
+                tree->insert(10, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(7, pathVector, 1);
+
+                tree->deleteNode(7);
+                REQUIRE(tree->search(7) == nullptr);
+                tree->deleteNode(10);
+                REQUIRE(tree->search(10) == nullptr);
+                tree->deleteNode(5);
+                REQUIRE(tree->search(5) == nullptr);
+                tree->deleteNode(3);
+                REQUIRE(tree->search(3) == nullptr);
+            }
         }
     }
     SECTION("ip") {
+        auto ip1 = IPFactory::newIP("192.0.2.235");
+        auto ip2 = IPFactory::newIP("192.0.2.236");
+        auto ip3 = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+        auto ip4 = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:ffff:07a0:765d");
 
+        SECTION("Empty tree") {
+            auto tree = new MultiTree<IP *, IPComparator>();
+            REQUIRE(tree->getRoot() == nullptr);
+            REQUIRE(tree->search(IPFactory::newIP("192.0.2.235")) == nullptr);
+
+            SECTION("Insertion") {
+                tree->insert(ip1);
+                REQUIRE(tree->getRoot() != nullptr);
+                tree->insert(ip2);
+                REQUIRE(tree->search(ip2) != nullptr);
+                std::string path = "0";
+                tree->insert(ip3, path, ' ', 0);
+                REQUIRE(tree->search(ip3) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(ip4, pathVector, 1);
+                REQUIRE(tree->search(ip4) != nullptr);
+            }
+
+            SECTION("Deletion") {
+                tree->insert(ip1);
+                tree->insert(ip2);
+                std::string path = "0";
+                tree->insert(ip3, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(ip4, pathVector, 1);
+
+                tree->deleteNode(ip4);
+                REQUIRE(tree->search(ip4) == nullptr);
+                tree->deleteNode(ip3);
+                REQUIRE(tree->search(ip3) == nullptr);
+                tree->deleteNode(ip2);
+                REQUIRE(tree->search(ip2) == nullptr);
+                tree->deleteNode(ip1);
+                REQUIRE(tree->search(ip1) == nullptr);
+            }
+        }
+        SECTION("Tree with root") {
+            auto tree = new MultiTree<IP *, IPComparator>(ip1);
+            SECTION("Insertion") {
+                REQUIRE(tree->getRoot() != nullptr);
+                tree->insert(ip2);
+                REQUIRE(tree->search(ip2) != nullptr);
+                std::string path = "0";
+                tree->insert(ip3, path, ' ', 0);
+                REQUIRE(tree->search(ip3) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(ip4, pathVector, 1);
+                REQUIRE(tree->search(ip4) != nullptr);
+            }
+
+            SECTION("Deletion") {
+                tree->insert(ip2);
+                std::string path = "0";
+                tree->insert(ip3, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(ip4, pathVector, 1);
+
+                tree->deleteNode(ip4);
+                REQUIRE(tree->search(ip4) == nullptr);
+                tree->deleteNode(ip3);
+                REQUIRE(tree->search(ip3) == nullptr);
+                tree->deleteNode(ip2);
+                REQUIRE(tree->search(ip2) == nullptr);
+                tree->deleteNode(ip1);
+                REQUIRE(tree->search(ip1) == nullptr);
+            }
+        }
     }
 
     SECTION("subnet") {
@@ -536,7 +642,7 @@ TEST_CASE("BinaryTree", "[BinaryTree]") {
     SECTION("int") {
 
         SECTION("Empty tree") {
-            auto tree = new MultiTree<int, std::less<>>();
+            auto tree = new BinTree<int, std::less<>>();
             REQUIRE(tree->getRoot() == nullptr);
             REQUIRE(tree->search(10) == nullptr);
 
@@ -544,7 +650,7 @@ TEST_CASE("BinaryTree", "[BinaryTree]") {
                 tree->insert(3);
                 REQUIRE(tree->getRoot() != nullptr);
                 REQUIRE(tree->getRoot()->getKey() == 3);
-                tree->insert(5);
+                tree->insert(5,tree->getRoot(),0);
                 REQUIRE(tree->search(5) != nullptr);
                 REQUIRE(tree->getRoot()->getChildren()[0]->getKey() == 5);
                 std::string path = "0";
@@ -553,14 +659,32 @@ TEST_CASE("BinaryTree", "[BinaryTree]") {
                 std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
                 tree->insert(7, pathVector, 1);
                 REQUIRE(tree->search(7) != nullptr);
+            }
+
+            SECTION("Deletion") {
+                tree->insert(3);
+                tree->insert(5);
+                std::string path = "0";
+                tree->insert(10, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(7, pathVector, 1);
+
+                tree->deleteNode(7);
+                REQUIRE(tree->search(7) == nullptr);
+                tree->deleteNode(10);
+                REQUIRE(tree->search(10) == nullptr);
+                tree->deleteNode(5);
+                REQUIRE(tree->search(5) == nullptr);
+                tree->deleteNode(3);
+                REQUIRE(tree->search(3) == nullptr);
             }
         }
         SECTION("Tree with root") {
-            auto tree = new MultiTree<int, std::less<>>(3);
+            auto tree = new BinTree<int, std::less<>>(3);
             SECTION("Insertion") {
                 REQUIRE(tree->getRoot() != nullptr);
                 REQUIRE(tree->getRoot()->getKey() == 3);
-                tree->insert(5);
+                tree->insert(5,tree->getRoot(),0);
                 REQUIRE(tree->search(5) != nullptr);
                 REQUIRE(tree->getRoot()->getChildren()[0]->getKey() == 5);
                 std::string path = "0";
@@ -570,16 +694,99 @@ TEST_CASE("BinaryTree", "[BinaryTree]") {
                 tree->insert(7, pathVector, 1);
                 REQUIRE(tree->search(7) != nullptr);
             }
-        }
-        SECTION("insert") {
 
-        }
-        SECTION("delete") {
+            SECTION("Deletion") {
+                tree->insert(5);
+                std::string path = "0";
+                tree->insert(10, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(7, pathVector, 1);
 
+                tree->deleteNode(7);
+                REQUIRE(tree->search(7) == nullptr);
+                tree->deleteNode(10);
+                REQUIRE(tree->search(10) == nullptr);
+                tree->deleteNode(5);
+                REQUIRE(tree->search(5) == nullptr);
+                tree->deleteNode(3);
+                REQUIRE(tree->search(3) == nullptr);
+            }
         }
+
     }
     SECTION("ip") {
+        auto ip1 = IPFactory::newIP("192.0.2.235");
+        auto ip2 = IPFactory::newIP("192.0.2.236");
+        auto ip3 = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+        auto ip4 = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:ffff:07a0:765d");
 
+        SECTION("Empty tree") {
+            auto tree = new BinTree<IP *, IPComparator>();
+            REQUIRE(tree->getRoot() == nullptr);
+            REQUIRE(tree->search(IPFactory::newIP("192.0.2.235")) == nullptr);
+
+            SECTION("Insertion") {
+                tree->insert(ip1);
+                REQUIRE(tree->getRoot() != nullptr);
+                tree->insert(ip2,tree->getRoot(),0);
+                REQUIRE(tree->search(ip2) != nullptr);
+                std::string path = "0";
+                tree->insert(ip3, path, ' ', 0);
+                REQUIRE(tree->search(ip3) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(ip4, pathVector, 1);
+                REQUIRE(tree->search(ip4) != nullptr);
+            }
+
+            SECTION("Deletion") {
+                tree->insert(ip1);
+                tree->insert(ip2);
+                std::string path = "0";
+                tree->insert(ip3, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(ip4, pathVector, 1);
+
+                tree->deleteNode(ip4);
+                REQUIRE(tree->search(ip4) == nullptr);
+                tree->deleteNode(ip3);
+                REQUIRE(tree->search(ip3) == nullptr);
+                tree->deleteNode(ip2);
+                REQUIRE(tree->search(ip2) == nullptr);
+                tree->deleteNode(ip1);
+                REQUIRE(tree->search(ip1) == nullptr);
+            }
+        }
+        SECTION("Tree with root") {
+            auto tree = new BinTree<IP *, IPComparator>(ip1);
+            SECTION("Insertion") {
+                REQUIRE(tree->getRoot() != nullptr);
+                tree->insert(ip2,tree->getRoot(),0);
+                REQUIRE(tree->search(ip2) != nullptr);
+                std::string path = "0";
+                tree->insert(ip3, path, ' ', 0);
+                REQUIRE(tree->search(ip3) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(ip4, pathVector, 1);
+                REQUIRE(tree->search(ip4) != nullptr);
+            }
+
+            SECTION("Deletion") {
+                tree->insert(ip2);
+                std::string path = "0";
+                tree->insert(ip3, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(ip4, pathVector, 1);
+
+                tree->deleteNode(ip4);
+                REQUIRE(tree->search(ip4) == nullptr);
+                tree->deleteNode(ip3);
+                REQUIRE(tree->search(ip3) == nullptr);
+                tree->deleteNode(ip2);
+                REQUIRE(tree->search(ip2) == nullptr);
+                tree->deleteNode(ip1);
+                REQUIRE(tree->search(ip1) == nullptr);
+            }
+        }
     }
 
     SECTION("subnet") {
@@ -608,6 +815,24 @@ TEST_CASE("BSTree", "[BSTree]") {
             REQUIRE(tree->search(7) != nullptr);
         }
 
+        SECTION("Deletion") {
+            tree->insert(3);
+            tree->insert(5);
+            std::string path = "0";
+            tree->insert(10, path, ' ', 0);
+            std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+            tree->insert(7, pathVector, 1);
+
+            tree->deleteNode(7);
+            REQUIRE(tree->search(7) == nullptr);
+            tree->deleteNode(10);
+            REQUIRE(tree->search(10) == nullptr);
+            tree->deleteNode(5);
+            REQUIRE(tree->search(5) == nullptr);
+            tree->deleteNode(3);
+            REQUIRE(tree->search(3) == nullptr);
+        }
+
         SECTION("Tree with root") {
             auto tree = new MultiTree<int, std::less<>>(3);
             SECTION("Insertion") {
@@ -623,10 +848,97 @@ TEST_CASE("BSTree", "[BSTree]") {
                 tree->insert(7, pathVector, 1);
                 REQUIRE(tree->search(7) != nullptr);
             }
+            SECTION("Deletion") {
+                tree->insert(5);
+                std::string path = "0";
+                tree->insert(10, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(7, pathVector, 1);
+
+                tree->deleteNode(7);
+                REQUIRE(tree->search(7) == nullptr);
+                tree->deleteNode(10);
+                REQUIRE(tree->search(10) == nullptr);
+                tree->deleteNode(5);
+                REQUIRE(tree->search(5) == nullptr);
+                tree->deleteNode(3);
+                REQUIRE(tree->search(3) == nullptr);
+            }
         }
     }
     SECTION("ip") {
+        auto ip1 = IPFactory::newIP("192.0.2.235");
+        auto ip2 = IPFactory::newIP("192.0.2.236");
+        auto ip3 = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d");
+        auto ip4 = IPFactory::newIP("2001:0db8:11a3:09d7:1f34:ffff:07a0:765d");
 
+        SECTION("Empty tree") {
+            auto tree = new BSTree<IP *, IPComparator>();
+            REQUIRE(tree->getRoot() == nullptr);
+            REQUIRE(tree->search(IPFactory::newIP("192.0.2.235")) == nullptr);
+
+            SECTION("Insertion") {
+                tree->insert(ip1);
+                REQUIRE(tree->getRoot() != nullptr);
+                tree->insert(ip2);
+                REQUIRE(tree->search(ip2) != nullptr);
+                std::string path = "0";
+                tree->insert(ip3, path, ' ', 0);
+                REQUIRE(tree->search(ip3) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(ip4, pathVector, 1);
+                REQUIRE(tree->search(ip4) != nullptr);
+            }
+
+            SECTION("Deletion") {
+                tree->insert(ip1);
+                tree->insert(ip2);
+                std::string path = "0";
+                tree->insert(ip3, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(ip4, pathVector, 1);
+
+                tree->deleteNode(ip4);
+                REQUIRE(tree->search(ip4) == nullptr);
+                tree->deleteNode(ip3);
+                REQUIRE(tree->search(ip3) == nullptr);
+                tree->deleteNode(ip2);
+                REQUIRE(tree->search(ip2) == nullptr);
+                tree->deleteNode(ip1);
+                REQUIRE(tree->search(ip1) == nullptr);
+            }
+        }
+        SECTION("Tree with root") {
+            auto tree = new BSTree<IP *, IPComparator>(ip1);
+            SECTION("Insertion") {
+                REQUIRE(tree->getRoot() != nullptr);
+                tree->insert(ip2);
+                REQUIRE(tree->search(ip2) != nullptr);
+                std::string path = "0";
+                tree->insert(ip3, path, ' ', 0);
+                REQUIRE(tree->search(ip3) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(ip4, pathVector, 1);
+                REQUIRE(tree->search(ip4) != nullptr);
+            }
+
+            SECTION("Deletion") {
+                tree->insert(ip2);
+                std::string path = "0";
+                tree->insert(ip3, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(ip4, pathVector, 1);
+
+                tree->deleteNode(ip4);
+                REQUIRE(tree->search(ip4) == nullptr);
+                tree->deleteNode(ip3);
+                REQUIRE(tree->search(ip3) == nullptr);
+                tree->deleteNode(ip2);
+                REQUIRE(tree->search(ip2) == nullptr);
+                tree->deleteNode(ip1);
+                REQUIRE(tree->search(ip1) == nullptr);
+            }
+        }
     }
 
     SECTION("subnet") {

@@ -224,13 +224,7 @@ void MultiNode<Key>::setKey(const Key &key) {
 
 template<typename Key>
 MultiNode<Key>::~MultiNode() {
-    if (this->parent != nullptr) {
-        for (auto i:this->parent->children) {
-            if (i == this) {
-                i = nullptr;
-            }
-        }
-    }
+
 }
 
 template<typename Key, typename Cmp>
@@ -278,7 +272,10 @@ void MultiTree<Key, Cmp>::insert(const Key &key, AbstractNode<Key> *node, int po
 
 template<typename Key, typename Cmp>
 AbstractNode<Key> *MultiTree<Key, Cmp>::search(const Key &key) {
-    if (this->root == nullptr || this->root->getKey() == key)
+    Cmp cmp;
+    if (this->root == nullptr)
+        return nullptr;
+    if (!cmp(this->root->getKey(), key) && !cmp(key, this->root->getKey()))
         return this->root;
     AbstractNode<Key> *tmp = nullptr;
     std::stack<AbstractNode<Key> *> stack;
@@ -286,12 +283,15 @@ AbstractNode<Key> *MultiTree<Key, Cmp>::search(const Key &key) {
     while (!stack.empty()) {
         tmp = stack.top();
         stack.pop();
-        if (tmp->getKey() == key)
+        if (tmp == nullptr)
+            continue;
+        if (!cmp(tmp->getKey(), key) && !cmp(key, tmp->getKey()))
             return tmp;
         auto nodes = tmp->getChildren();
         if (!nodes.empty()) {
             for (auto i:nodes) {
-                stack.push(i);
+                if (i != nullptr)
+                    stack.push(i);
             }
         }
     }
@@ -301,7 +301,11 @@ AbstractNode<Key> *MultiTree<Key, Cmp>::search(const Key &key) {
 template<typename Key, typename Cmp>
 void MultiTree<Key, Cmp>::deleteNode(const Key &key) {
     auto node = search(key);
-    if (node == this->root && node->getChildren().empty()) {
+    if (node == this->root) {
+        for (auto i:node->getChildren()) {
+            if (i != nullptr)
+                return;
+        }
         delete this->root;
         this->root = nullptr;
         return;
@@ -310,6 +314,15 @@ void MultiTree<Key, Cmp>::deleteNode(const Key &key) {
         if (i != nullptr)
             return;
     }
+
+    if (node->parent != nullptr) {
+        for (int i = 0; i < node->parent->children.size(); ++i) {
+            if (node->parent->children[i] == node) {
+                node->parent->children[i] = nullptr;
+            }
+        }
+    }
+
     delete node;
 }
 
@@ -405,12 +418,16 @@ void BinTree<Key, Cmp>::insert(const Key &key, AbstractNode<Key> *node, int pos)
 template<typename Key, typename Cmp>
 void BinTree<Key, Cmp>::deleteNode(const Key &key) {
     auto node = search(key);
-    if (node == this->root && node->getChildren().empty()) {
-        delete this->root;
-        this->root = nullptr;
+    if (node == nullptr)
         return;
-    }
     auto children = node->getChildren();
+    if (node == this->root) {
+        if (children[0] == nullptr && children[1] == nullptr) {
+            delete this->root;
+            this->root = nullptr;
+            return;
+        }
+    }
     if (children[0] == nullptr && children[1] == nullptr) {
         delete node;
     }
@@ -418,8 +435,11 @@ void BinTree<Key, Cmp>::deleteNode(const Key &key) {
 
 template<typename Key, typename Cmp>
 AbstractNode<Key> *BinTree<Key, Cmp>::search(const Key &key) {
+    Cmp cmp;
     if (this->root == nullptr)
         return nullptr;
+    if (!cmp(this->root->getKey(), key) && !cmp(key, this->root->getKey()))
+        return this->root;
     std::stack<AbstractNode<Key> *> stack;
     AbstractNode<Key> *tmp = nullptr;
     stack.push(this->root);
