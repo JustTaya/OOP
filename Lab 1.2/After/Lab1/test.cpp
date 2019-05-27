@@ -485,7 +485,6 @@ TEST_CASE("BinNode", "[BinNode]") {
 
 TEST_CASE("MultiTree", "[MultiTree]") {
     SECTION("int") {
-
         SECTION("Empty tree") {
             auto tree = new MultiTree<int, std::less<>>();
             REQUIRE(tree->getRoot() == nullptr);
@@ -634,7 +633,81 @@ TEST_CASE("MultiTree", "[MultiTree]") {
     }
 
     SECTION("subnet") {
+        auto subnet1 = SubNetworkFactory::newSubNetwork(IPFactory::newIP("192.0.2.235"), 31);
+        auto subnet2 = SubNetworkFactory::newSubNetwork(IPFactory::newIP("192.0.2.236"), 27);
+        auto subnet3 = SubNetworkFactory::newSubNetwork(IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d"),
+                                                        127);
+        auto subnet4 = SubNetworkFactory::newSubNetwork(IPFactory::newIP("2001:0db8:11a3:09d7:1f34:ffff:07a0:765d"),
+                                                        120);
 
+
+        SECTION("Empty tree") {
+            auto tree = new MultiTree<SubNetwork *, SubNetworkComparator>();
+            REQUIRE(tree->getRoot() == nullptr);
+            REQUIRE(tree->search(SubNetworkFactory::newSubNetwork(IPFactory::newIP("192.0.2.235"), 31)) == nullptr);
+
+            SECTION("Insertion") {
+                tree->insert(subnet1);
+                REQUIRE(tree->getRoot() != nullptr);
+                tree->insert(subnet2);
+                REQUIRE(tree->search(subnet2) != nullptr);
+                std::string path = "0";
+                tree->insert(subnet3, path, ' ', 0);
+                REQUIRE(tree->search(subnet3) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(subnet4, pathVector, 1);
+                REQUIRE(tree->search(subnet4) != nullptr);
+            }
+
+            SECTION("Deletion") {
+                tree->insert(subnet1);
+                tree->insert(subnet2);
+                std::string path = "0";
+                tree->insert(subnet3, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(subnet4, pathVector, 1);
+
+                tree->deleteNode(subnet4);
+                REQUIRE(tree->search(subnet4) == nullptr);
+                tree->deleteNode(subnet3);
+                REQUIRE(tree->search(subnet3) == nullptr);
+                tree->deleteNode(subnet2);
+                REQUIRE(tree->search(subnet2) == nullptr);
+                tree->deleteNode(subnet1);
+                REQUIRE(tree->search(subnet1) == nullptr);
+            }
+        }
+        SECTION("Tree with root") {
+            auto tree = new MultiTree<SubNetwork *, SubNetworkComparator>(subnet1);
+            SECTION("Insertion") {
+                REQUIRE(tree->getRoot() != nullptr);
+                tree->insert(subnet2);
+                REQUIRE(tree->search(subnet2) != nullptr);
+                std::string path = "0";
+                tree->insert(subnet3, path, ' ', 0);
+                REQUIRE(tree->search(subnet3) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(subnet4, pathVector, 1);
+                REQUIRE(tree->search(subnet4) != nullptr);
+            }
+
+            SECTION("Deletion") {
+                tree->insert(subnet2);
+                std::string path = "0";
+                tree->insert(subnet3, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(subnet4, pathVector, 1);
+
+                tree->deleteNode(subnet4);
+                REQUIRE(tree->search(subnet4) == nullptr);
+                tree->deleteNode(subnet3);
+                REQUIRE(tree->search(subnet3) == nullptr);
+                tree->deleteNode(subnet2);
+                REQUIRE(tree->search(subnet2) == nullptr);
+                tree->deleteNode(subnet1);
+                REQUIRE(tree->search(subnet1) == nullptr);
+            }
+        }
     }
 }
 
@@ -650,7 +723,7 @@ TEST_CASE("BinaryTree", "[BinaryTree]") {
                 tree->insert(3);
                 REQUIRE(tree->getRoot() != nullptr);
                 REQUIRE(tree->getRoot()->getKey() == 3);
-                tree->insert(5,tree->getRoot(),0);
+                tree->insert(5, tree->getRoot(), 0);
                 REQUIRE(tree->search(5) != nullptr);
                 REQUIRE(tree->getRoot()->getChildren()[0]->getKey() == 5);
                 std::string path = "0";
@@ -684,7 +757,7 @@ TEST_CASE("BinaryTree", "[BinaryTree]") {
             SECTION("Insertion") {
                 REQUIRE(tree->getRoot() != nullptr);
                 REQUIRE(tree->getRoot()->getKey() == 3);
-                tree->insert(5,tree->getRoot(),0);
+                tree->insert(5, tree->getRoot(), 0);
                 REQUIRE(tree->search(5) != nullptr);
                 REQUIRE(tree->getRoot()->getChildren()[0]->getKey() == 5);
                 std::string path = "0";
@@ -728,7 +801,7 @@ TEST_CASE("BinaryTree", "[BinaryTree]") {
             SECTION("Insertion") {
                 tree->insert(ip1);
                 REQUIRE(tree->getRoot() != nullptr);
-                tree->insert(ip2,tree->getRoot(),0);
+                tree->insert(ip2, tree->getRoot(), 0);
                 REQUIRE(tree->search(ip2) != nullptr);
                 std::string path = "0";
                 tree->insert(ip3, path, ' ', 0);
@@ -760,7 +833,7 @@ TEST_CASE("BinaryTree", "[BinaryTree]") {
             auto tree = new BinTree<IP *, IPComparator>(ip1);
             SECTION("Insertion") {
                 REQUIRE(tree->getRoot() != nullptr);
-                tree->insert(ip2,tree->getRoot(),0);
+                tree->insert(ip2, tree->getRoot(), 0);
                 REQUIRE(tree->search(ip2) != nullptr);
                 std::string path = "0";
                 tree->insert(ip3, path, ' ', 0);
@@ -790,7 +863,81 @@ TEST_CASE("BinaryTree", "[BinaryTree]") {
     }
 
     SECTION("subnet") {
+        auto subnet1 = SubNetworkFactory::newSubNetwork(IPFactory::newIP("192.0.2.235"), 31);
+        auto subnet2 = SubNetworkFactory::newSubNetwork(IPFactory::newIP("192.0.2.236"), 27);
+        auto subnet3 = SubNetworkFactory::newSubNetwork(IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d"),
+                                                        127);
+        auto subnet4 = SubNetworkFactory::newSubNetwork(IPFactory::newIP("2001:0db8:11a3:09d7:1f34:ffff:07a0:765d"),
+                                                        120);
 
+
+        SECTION("Empty tree") {
+            auto tree = new MultiTree<SubNetwork *, SubNetworkComparator>();
+            REQUIRE(tree->getRoot() == nullptr);
+            REQUIRE(tree->search(SubNetworkFactory::newSubNetwork(IPFactory::newIP("192.0.2.235"), 31)) == nullptr);
+
+            SECTION("Insertion") {
+                tree->insert(subnet1);
+                REQUIRE(tree->getRoot() != nullptr);
+                tree->insert(subnet2,tree->getRoot(),0);
+                REQUIRE(tree->search(subnet2) != nullptr);
+                std::string path = "0";
+                tree->insert(subnet3, path, ' ', 0);
+                REQUIRE(tree->search(subnet3) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(subnet4, pathVector, 1);
+                REQUIRE(tree->search(subnet4) != nullptr);
+            }
+
+            SECTION("Deletion") {
+                tree->insert(subnet1);
+                tree->insert(subnet2,tree->getRoot(),0);
+                std::string path = "0";
+                tree->insert(subnet3, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(subnet4, pathVector, 1);
+
+                tree->deleteNode(subnet4);
+                REQUIRE(tree->search(subnet4) == nullptr);
+                tree->deleteNode(subnet3);
+                REQUIRE(tree->search(subnet3) == nullptr);
+                tree->deleteNode(subnet2);
+                REQUIRE(tree->search(subnet2) == nullptr);
+                tree->deleteNode(subnet1);
+                REQUIRE(tree->search(subnet1) == nullptr);
+            }
+        }
+        SECTION("Tree with root") {
+            auto tree = new MultiTree<SubNetwork *, SubNetworkComparator>(subnet1);
+            SECTION("Insertion") {
+                REQUIRE(tree->getRoot() != nullptr);
+                tree->insert(subnet2,tree->getRoot(),0);
+                REQUIRE(tree->search(subnet2) != nullptr);
+                std::string path = "0";
+                tree->insert(subnet3, path, ' ', 0);
+                REQUIRE(tree->search(subnet3) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(subnet4, pathVector, 1);
+                REQUIRE(tree->search(subnet4) != nullptr);
+            }
+
+            SECTION("Deletion") {
+                tree->insert(subnet2,tree->getRoot(),0);
+                std::string path = "0";
+                tree->insert(subnet3, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(subnet4, pathVector, 1);
+
+                tree->deleteNode(subnet4);
+                REQUIRE(tree->search(subnet4) == nullptr);
+                tree->deleteNode(subnet3);
+                REQUIRE(tree->search(subnet3) == nullptr);
+                tree->deleteNode(subnet2);
+                REQUIRE(tree->search(subnet2) == nullptr);
+                tree->deleteNode(subnet1);
+                REQUIRE(tree->search(subnet1) == nullptr);
+            }
+        }
     }
 }
 
@@ -942,6 +1089,80 @@ TEST_CASE("BSTree", "[BSTree]") {
     }
 
     SECTION("subnet") {
+        auto subnet1 = SubNetworkFactory::newSubNetwork(IPFactory::newIP("192.0.2.235"), 31);
+        auto subnet2 = SubNetworkFactory::newSubNetwork(IPFactory::newIP("192.0.2.236"), 27);
+        auto subnet3 = SubNetworkFactory::newSubNetwork(IPFactory::newIP("2001:0db8:11a3:09d7:1f34:8a2e:07a0:765d"),
+                                                        127);
+        auto subnet4 = SubNetworkFactory::newSubNetwork(IPFactory::newIP("2001:0db8:11a3:09d7:1f34:ffff:07a0:765d"),
+                                                        120);
 
+
+        SECTION("Empty tree") {
+            auto tree = new MultiTree<SubNetwork *, SubNetworkComparator>();
+            REQUIRE(tree->getRoot() == nullptr);
+            REQUIRE(tree->search(SubNetworkFactory::newSubNetwork(IPFactory::newIP("192.0.2.235"), 31)) == nullptr);
+
+            SECTION("Insertion") {
+                tree->insert(subnet1);
+                REQUIRE(tree->getRoot() != nullptr);
+                tree->insert(subnet2);
+                REQUIRE(tree->search(subnet2) != nullptr);
+                std::string path = "0";
+                tree->insert(subnet3, path, ' ', 0);
+                REQUIRE(tree->search(subnet3) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(subnet4, pathVector, 1);
+                REQUIRE(tree->search(subnet4) != nullptr);
+            }
+
+            SECTION("Deletion") {
+                tree->insert(subnet1);
+                tree->insert(subnet2);
+                std::string path = "0";
+                tree->insert(subnet3, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(subnet4, pathVector, 1);
+
+                tree->deleteNode(subnet4);
+                REQUIRE(tree->search(subnet4) == nullptr);
+                tree->deleteNode(subnet3);
+                REQUIRE(tree->search(subnet3) == nullptr);
+                tree->deleteNode(subnet2);
+                REQUIRE(tree->search(subnet2) == nullptr);
+                tree->deleteNode(subnet1);
+                REQUIRE(tree->search(subnet1) == nullptr);
+            }
+        }
+        SECTION("Tree with root") {
+            auto tree = new MultiTree<SubNetwork *, SubNetworkComparator>(subnet1);
+            SECTION("Insertion") {
+                REQUIRE(tree->getRoot() != nullptr);
+                tree->insert(subnet2);
+                REQUIRE(tree->search(subnet2) != nullptr);
+                std::string path = "0";
+                tree->insert(subnet3, path, ' ', 0);
+                REQUIRE(tree->search(subnet3) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(subnet4, pathVector, 1);
+                REQUIRE(tree->search(subnet4) != nullptr);
+            }
+
+            SECTION("Deletion") {
+                tree->insert(subnet2);
+                std::string path = "0";
+                tree->insert(subnet3, path, ' ', 0);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(subnet4, pathVector, 1);
+
+                tree->deleteNode(subnet4);
+                REQUIRE(tree->search(subnet4) == nullptr);
+                tree->deleteNode(subnet3);
+                REQUIRE(tree->search(subnet3) == nullptr);
+                tree->deleteNode(subnet2);
+                REQUIRE(tree->search(subnet2) == nullptr);
+                tree->deleteNode(subnet1);
+                REQUIRE(tree->search(subnet1) == nullptr);
+            }
+        }
     }
 }
