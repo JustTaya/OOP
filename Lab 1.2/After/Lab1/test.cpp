@@ -518,7 +518,7 @@ TEST_CASE("BinaryTree", "[BinaryTree]") {
     SECTION("int") {
 
         SECTION("Empty tree") {
-            auto tree = new MultiTree<int, std::less<>>();
+            auto tree = new BinTree<int, std::less<>>();
             REQUIRE(tree->getRoot() == nullptr);
             REQUIRE(tree->search(10) == nullptr);
         }
@@ -555,9 +555,12 @@ TEST_CASE("BSTree", "[BSTree]") {
     SECTION("int") {
 
         SECTION("Empty tree") {
-            auto tree = new MultiTree<int, std::less<>>();
+            auto tree = new BSTree<int, std::less<int>>();
             REQUIRE(tree->getRoot() == nullptr);
             REQUIRE(tree->search(10) == nullptr);
+
+            tree->insert(3);
+            REQUIRE(tree->getRoot()!=nullptr);
         }
         SECTION("Tree with root") {
             int tmp = 10,
