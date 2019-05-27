@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <sstream>
+#include <stack>
 
 template<typename Key>
 class AbstractNode {
@@ -29,9 +30,21 @@ protected:
 
     virtual void addKey(const Key &key);
 
-    virtual void addChild(AbstractNode<Key> *child);
+    virtual void addChild(AbstractNode<Key> *child, int pos = -1);
 
     virtual void setParent(AbstractNode<Key> *node);
+
+    template<typename> friend
+    class MultiNode;
+
+    template<typename, typename> friend
+    class MultiTree;
+
+    template<typename, typename> friend
+    class BinaryTree;
+
+    template<typename, typename> friend
+    class BSTree;
 
 };
 
@@ -51,8 +64,15 @@ AbstractNode<Key> *AbstractNode<Key>::getParent() const {
 }
 
 template<typename Key>
-void AbstractNode<Key>::addChild(AbstractNode<Key> *child) {
-    AbstractNode<Key>::children.push_back(child);
+void AbstractNode<Key>::addChild(AbstractNode<Key> *child, int pos) {
+    if (pos < 0) {
+        AbstractNode<Key>::children.push_back(child);
+    } else {
+        if (children.size() <= pos) {
+            children.resize(pos + 1);
+        }
+        children[pos] = child;
+    }
 }
 
 template<typename Key>
@@ -65,7 +85,7 @@ class MultiNode : public AbstractNode<Key> {
 public:
     MultiNode(const Key &key, AbstractNode<Key> *parent = nullptr) : AbstractNode<Key>(key, parent) {};
 
-    ~MultiNode() override = default;
+    ~MultiNode() override;
 
     Key getKey() const override;
 
@@ -139,7 +159,7 @@ public:
     virtual void
     insert(const Key &key, const std::vector<unsigned> &path, int pos = -1, AbstractNode<Key> *node = nullptr) = 0;
 
-    virtual void insert(const Key &key, int pos = -1, AbstractNode<Key> *node = nullptr) = 0;
+    virtual void insert(const Key &key, AbstractNode<Key> *node = nullptr, int pos = -1) = 0;
 
     virtual AbstractNode<Key> *search(const Key &key) = 0;
 
@@ -186,7 +206,7 @@ public:
     void
     insert(const Key &key, const std::vector<unsigned> &path, int pos = -1, AbstractNode<Key> *node = nullptr) override;
 
-    void insert(const Key &key, int pos = -1, AbstractNode<Key> *node = nullptr) override;
+    void insert(const Key &key, AbstractNode<Key> *node = nullptr, int pos = -1) override;
 
     AbstractNode<Key> *search(const Key &key) override;
 
@@ -202,6 +222,17 @@ void MultiNode<Key>::setKey(const Key &key) {
     this->keys[0] = key;
 }
 
+template<typename Key>
+MultiNode<Key>::~MultiNode() {
+    if (this->parent != nullptr) {
+        for (auto i:this->parent->children) {
+            if (i == this) {
+                i = nullptr;
+            }
+        }
+    }
+}
+
 template<typename Key, typename Cmp>
 AbstractNode<Key> *MultiTree<Key, Cmp>::getRoot() const {
     return this->root;
@@ -211,14 +242,70 @@ template<typename Key, typename Cmp>
 void
 MultiTree<Key, Cmp>::insert(const Key &key, std::string &path, const char delimiter, int pos, AbstractNode<Key> *node) {
     std::vector<unsigned> pathVector = this->getPathVector(path, delimiter);
-    insert(key, pathVector, this->root);
+    insert(key, pathVector, pos, this->root);
 }
 
 template<typename Key, typename Cmp>
 void MultiTree<Key, Cmp>::insert(const Key &key, const std::vector<unsigned> &path, int pos, AbstractNode<Key> *node) {
+    auto current = node;
     for (auto i:path) {
+        if (current == nullptr) {
+            return;
+        }
         auto children = node->getChildren();
+        if (children.size() <= i) {
+            return;
+        }
+        current = children[i];
     }
+    insert(key, current, pos);
+}
+
+template<typename Key, typename Cmp>
+void MultiTree<Key, Cmp>::insert(const Key &key, AbstractNode<Key> *node, int pos) {
+    if (node == nullptr) {
+        if (this->root == nullptr)
+            return;
+        node->addChild(new MultiNode<Key>(key, this->root), pos);
+    }
+    node->addChild(new MultiNode<Key>(key, node), pos);
+}
+
+template<typename Key, typename Cmp>
+AbstractNode<Key> *MultiTree<Key, Cmp>::search(const Key &key) {
+    if (this->root == nullptr || this->root->getKey() == key)
+        return this->root;
+    AbstractNode<Key> *tmp = nullptr;
+    std::stack<AbstractNode<Key> *> stack;
+    stack.push(this->root);
+    while (!stack.empty()) {
+        tmp = stack.top();
+        stack.pop();
+        if (tmp->getKey() == key)
+            return tmp;
+        auto nodes = tmp->getChildren();
+        if (!nodes.empty()) {
+            for (auto i:nodes) {
+                stack.push(i);
+            }
+        }
+    }
+    return nullptr;
+}
+
+template<typename Key, typename Cmp>
+void MultiTree<Key, Cmp>::deleteNode(const Key &key) {
+    auto node = search(key);
+    if (node == this->root && node->getChildren().empty()) {
+        delete this->root;
+        this->root = nullptr;
+        return;
+    }
+    for (auto i:node->getChildren()) {
+        if (i != nullptr)
+            return;
+    }
+    delete node;
 }
 
 template<typename Key, typename Cmp>
@@ -236,9 +323,10 @@ public:
                 AbstractNode<Key> *node = nullptr) override;
 
     void
-    insert(const Key &key, const std::vector<unsigned> &path, int pos = -1, AbstractNode<Key> *node = nullptr) override;
+    insert(const Key &key, const std::vector<unsigned> &path, int pos = -1,
+           AbstractNode<Key> *node = nullptr) override;
 
-    void insert(const Key &key, int pos = -1, AbstractNode<Key> *node = nullptr) override;
+    void insert(const Key &key, AbstractNode<Key> *node = nullptr, int pos = -1) override;
 
     AbstractNode<Key> *search(const Key &key) override;
 
@@ -259,14 +347,78 @@ AbstractNode<Key> *BinTree<Key, Cmp>::getRoot() const {
 
 template<typename Key, typename Cmp>
 void
-BinTree<Key, Cmp>::insert(const Key &key, std::string &path, const char delimiter, int pos, AbstractNode<Key> *node) {
+BinTree<Key, Cmp>::insert(const Key &key, std::string &path, const char delimiter, int pos,
+                          AbstractNode<Key> *node) {
     std::vector<unsigned> pathVector = this->getPathVector(path, delimiter);
     insert(key, pathVector, this->root);
 }
 
 template<typename Key, typename Cmp>
-void BinTree<Key, Cmp>::insert(const Key &key, const std::vector<unsigned> &path, int pos, AbstractNode<Key> *node) {
+void
+BinTree<Key, Cmp>::insert(const Key &key, const std::vector<unsigned> &path, int pos, AbstractNode<Key> *node) {
+    auto current = node;
+    for (auto i:path) {
+        if (current == nullptr) {
+            return;
+        }
+        auto children = node->getChildren();
+        if (children.size() <= i || i > 1) {
+            return;
+        }
+        current = children[i];
+    }
+    insert(key, pos, current);
+}
 
+template<typename Key, typename Cmp>
+void BinTree<Key, Cmp>::insert(const Key &key, AbstractNode<Key> *node, int pos) {
+    auto children = node->getChildren();
+    if (pos == -1) {
+        if (children[0] == nullptr) {
+            node->addChild(new BinaryNode<Key>(key, node), 0);
+        } else if (children[1] == nullptr) {
+            node->addChild(new BinaryNode<Key>(key, node), 1);
+        } else {
+            return;
+        }
+    }
+    node->addChild(new BinaryNode<Key>(key, node), pos);
+}
+
+template<typename Key, typename Cmp>
+void BinTree<Key, Cmp>::deleteNode(const Key &key) {
+    auto node = search(key);
+    if (node == this->_root && node->getChildren().empty()) {
+        delete this->_root;
+        this->_root = nullptr;
+        return;
+    }
+    auto children = node->getChildren();
+    if (children[0] == nullptr && children[1] == nullptr) {
+        delete node;
+    }
+}
+
+template<typename Key, typename Cmp>
+AbstractNode<Key> *BinTree<Key, Cmp>::search(const Key &key) {
+    if (this->root == nullptr)
+        return nullptr;
+    std::stack<BinaryNode<Key> *> stack;
+    BinaryNode<Key> *tmp = nullptr;
+    stack.push(this->_root);
+    while (!stack.empty()) {
+        tmp = stack.top();
+        stack.pop();
+        if (tmp->getKey() == key) {
+            return tmp;
+        } else {
+            if (tmp->getLeft() != nullptr)
+                stack.push(tmp->getLeft());
+            if (tmp->getRight() != nullptr)
+                stack.push(tmp->getRight());
+        }
+    }
+    return nullptr;
 }
 
 template<typename Key, typename Cmp>
@@ -282,7 +434,8 @@ public:
                 AbstractNode<Key> *node = nullptr) override;
 
     void
-    insert(const Key &key, const std::vector<unsigned> &path, int pos = -1, AbstractNode<Key> *node = nullptr) override;
+    insert(const Key &key, const std::vector<unsigned> &path, int pos = -1,
+           AbstractNode<Key> *node = nullptr) override;
 
     void insert(const Key &key, int pos = -1, AbstractNode<Key> *node = nullptr) override;
 
@@ -382,7 +535,8 @@ BinaryNode<Key> *BSTree<Key, Cmp>::_deleteMin(BinaryNode<Key> *node) {
 
 template<typename Key, typename Cmp>
 void
-BSTree<Key, Cmp>::insert(const Key &key, std::string &path, const char delimiter, int pos, AbstractNode<Key> *node) {
+BSTree<Key, Cmp>::insert(const Key &key, std::string &path, const char delimiter, int pos,
+                         AbstractNode<Key> *node) {
 }
 
 template<typename Key, typename Cmp>
