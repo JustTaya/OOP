@@ -248,11 +248,13 @@ MultiTree<Key, Cmp>::insert(const Key &key, std::string &path, const char delimi
 template<typename Key, typename Cmp>
 void MultiTree<Key, Cmp>::insert(const Key &key, const std::vector<unsigned> &path, int pos, AbstractNode<Key> *node) {
     auto current = node;
+    if (current == nullptr)
+        current = this->root;
     for (auto i:path) {
         if (current == nullptr) {
             return;
         }
-        auto children = node->getChildren();
+        auto children = current->getChildren();
         if (children.size() <= i) {
             return;
         }
@@ -267,7 +269,7 @@ void MultiTree<Key, Cmp>::insert(const Key &key, AbstractNode<Key> *node, int po
         if (this->root == nullptr) {
             this->root = new MultiNode<Key>(key, nullptr);
         } else {
-            node->addChild(new MultiNode<Key>(key, this->root), pos);
+            this->root->addChild(new MultiNode<Key>(key, this->root), pos);
         }
         return;
     }
@@ -360,11 +362,13 @@ template<typename Key, typename Cmp>
 void
 BinTree<Key, Cmp>::insert(const Key &key, const std::vector<unsigned> &path, int pos, AbstractNode<Key> *node) {
     auto current = node;
+    if (current == nullptr)
+        current = this->root;
     for (auto i:path) {
         if (current == nullptr) {
             return;
         }
-        auto children = node->getChildren();
+        auto children = current->getChildren();
         if (children.size() <= i || i > 1) {
             return;
         }

@@ -490,18 +490,36 @@ TEST_CASE("MultiTree", "[MultiTree]") {
             auto tree = new MultiTree<int, std::less<>>();
             REQUIRE(tree->getRoot() == nullptr);
             REQUIRE(tree->search(10) == nullptr);
+
+            SECTION("Insertion") {
+                tree->insert(3);
+                REQUIRE(tree->getRoot() != nullptr);
+                REQUIRE(tree->getRoot()->getKey() == 3);
+                tree->insert(5);
+                REQUIRE(tree->search(5) != nullptr);
+                REQUIRE(tree->getRoot()->getChildren()[0]->getKey() == 5);
+                std::string path = "0";
+                tree->insert(10, path, ' ', 0);
+                REQUIRE(tree->search(10) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(7, pathVector, 1);
+                REQUIRE(tree->search(7) != nullptr);
+            }
         }
         SECTION("Tree with root") {
-            int tmp = 10,
-                    tmp1 = 3,
-                    tmp2 = 5;
-
-            auto tree = new MultiTree<int, std::less<>>(tmp);
-
-            SECTION("root") {
-                REQUIRE(tree->search(tmp)->getKey() == tmp);
-                REQUIRE(tree->getRoot()->getKey() == tmp);
-                REQUIRE(tree->getRoot() == tree->search(tmp));
+            auto tree = new MultiTree<int, std::less<>>(3);
+            SECTION("Insertion") {
+                REQUIRE(tree->getRoot() != nullptr);
+                REQUIRE(tree->getRoot()->getKey() == 3);
+                tree->insert(5);
+                REQUIRE(tree->search(5) != nullptr);
+                REQUIRE(tree->getRoot()->getChildren()[0]->getKey() == 5);
+                std::string path = "0";
+                tree->insert(10, path, ' ', 0);
+                REQUIRE(tree->search(10) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(7, pathVector, 1);
+                REQUIRE(tree->search(7) != nullptr);
             }
         }
     }
@@ -518,21 +536,39 @@ TEST_CASE("BinaryTree", "[BinaryTree]") {
     SECTION("int") {
 
         SECTION("Empty tree") {
-            auto tree = new BinTree<int, std::less<>>();
+            auto tree = new MultiTree<int, std::less<>>();
             REQUIRE(tree->getRoot() == nullptr);
             REQUIRE(tree->search(10) == nullptr);
+
+            SECTION("Insertion") {
+                tree->insert(3);
+                REQUIRE(tree->getRoot() != nullptr);
+                REQUIRE(tree->getRoot()->getKey() == 3);
+                tree->insert(5);
+                REQUIRE(tree->search(5) != nullptr);
+                REQUIRE(tree->getRoot()->getChildren()[0]->getKey() == 5);
+                std::string path = "0";
+                tree->insert(10, path, ' ', 0);
+                REQUIRE(tree->search(10) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(7, pathVector, 1);
+                REQUIRE(tree->search(7) != nullptr);
+            }
         }
         SECTION("Tree with root") {
-            int tmp = 10,
-                    tmp1 = 3,
-                    tmp2 = 5;
-
-            auto tree = new MultiTree<int, std::less<>>(tmp);
-
-            SECTION("root") {
-                REQUIRE(tree->search(tmp)->getKey() == tmp);
-                REQUIRE(tree->getRoot()->getKey() == tmp);
-                REQUIRE(tree->getRoot() == tree->search(tmp));
+            auto tree = new MultiTree<int, std::less<>>(3);
+            SECTION("Insertion") {
+                REQUIRE(tree->getRoot() != nullptr);
+                REQUIRE(tree->getRoot()->getKey() == 3);
+                tree->insert(5);
+                REQUIRE(tree->search(5) != nullptr);
+                REQUIRE(tree->getRoot()->getChildren()[0]->getKey() == 5);
+                std::string path = "0";
+                tree->insert(10, path, ' ', 0);
+                REQUIRE(tree->search(10) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(7, pathVector, 1);
+                REQUIRE(tree->search(7) != nullptr);
             }
         }
         SECTION("insert") {
@@ -552,27 +588,40 @@ TEST_CASE("BinaryTree", "[BinaryTree]") {
 }
 
 TEST_CASE("BSTree", "[BSTree]") {
-    SECTION("int") {
+    SECTION("Empty tree") {
+        auto tree = new MultiTree<int, std::less<>>();
+        REQUIRE(tree->getRoot() == nullptr);
+        REQUIRE(tree->search(10) == nullptr);
 
-        SECTION("Empty tree") {
-            auto tree = new BSTree<int, std::less<int>>();
-            REQUIRE(tree->getRoot() == nullptr);
-            REQUIRE(tree->search(10) == nullptr);
-
+        SECTION("Insertion") {
             tree->insert(3);
-            REQUIRE(tree->getRoot()!=nullptr);
+            REQUIRE(tree->getRoot() != nullptr);
+            REQUIRE(tree->getRoot()->getKey() == 3);
+            tree->insert(5);
+            REQUIRE(tree->search(5) != nullptr);
+            REQUIRE(tree->getRoot()->getChildren()[0]->getKey() == 5);
+            std::string path = "0";
+            tree->insert(10, path, ' ', 0);
+            REQUIRE(tree->search(10) != nullptr);
+            std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+            tree->insert(7, pathVector, 1);
+            REQUIRE(tree->search(7) != nullptr);
         }
+
         SECTION("Tree with root") {
-            int tmp = 10,
-                    tmp1 = 3,
-                    tmp2 = 5;
-
-            auto tree = new MultiTree<int, std::less<>>(tmp);
-
-            SECTION("root") {
-                REQUIRE(tree->search(tmp)->getKey() == tmp);
-                REQUIRE(tree->getRoot()->getKey() == tmp);
-                REQUIRE(tree->getRoot() == tree->search(tmp));
+            auto tree = new MultiTree<int, std::less<>>(3);
+            SECTION("Insertion") {
+                REQUIRE(tree->getRoot() != nullptr);
+                REQUIRE(tree->getRoot()->getKey() == 3);
+                tree->insert(5);
+                REQUIRE(tree->search(5) != nullptr);
+                REQUIRE(tree->getRoot()->getChildren()[0]->getKey() == 5);
+                std::string path = "0";
+                tree->insert(10, path, ' ', 0);
+                REQUIRE(tree->search(10) != nullptr);
+                std::vector<unsigned> pathVector = std::vector<unsigned>({0, 0});
+                tree->insert(7, pathVector, 1);
+                REQUIRE(tree->search(7) != nullptr);
             }
         }
     }
